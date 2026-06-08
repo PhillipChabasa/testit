@@ -1,0 +1,4486 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>TESTIT — Professional MCQ Engine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — DARK MODE (default)
+   ═══════════════════════════════════════════ */
+:root {
+  --bg:        #000000;
+  --bg1:       #0b0d11;
+  --bg2:       #0f1318;
+  --bg3:       #161b24;
+  --bg4:       #1d2433;
+  --border:    #1f2736;
+  --border2:   #28344a;
+  --text:      #eef0f8;
+  --text2:     #8b95b0;
+  --text3:     #434d66;
+  --accent:    #60efbc;
+  --accent2:   #3b82f6;
+  --accent3:   #818cf8;
+  --green:     #34d399;
+  --green-bg:  rgba(52,211,153,0.10);
+  --red:       #fb7185;
+  --red-bg:    rgba(251,113,133,0.10);
+  --yellow:    #fbbf24;
+  --yellow-bg: rgba(251,191,36,0.09);
+  --purple:    #c084fc;
+  --orange:    #f97316;
+  --radius:    10px;
+  --radius2:   16px;
+  --radius3:   24px;
+  --mono:      'JetBrains Mono', monospace;
+  --display:   'Syne', sans-serif;
+  --body:      'Inter', sans-serif;
+  --sidebar-w: 268px;
+  --nav-w:     60px;
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+  --shadow:    0 8px 32px rgba(0,0,0,0.5);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --glow:      0 0 0 1px rgba(96,239,188,0.12);
+  --touch:     48px;
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE
+   ═══════════════════════════════════════════ */
+[data-theme="light"] {
+  --bg:        #f4f6fb;
+  --bg1:       #ffffff;
+  --bg2:       #f0f3fa;
+  --bg3:       #e8ecf5;
+  --bg4:       #dde3f0;
+  --border:    #d4daea;
+  --border2:   #c0cada;
+  --text:      #111827;
+  --text2:     #4b5568;
+  --text3:     #9ca3af;
+  --accent:    #059669;
+  --accent2:   #2563eb;
+  --accent3:   #6366f1;
+  --green:     #059669;
+  --green-bg:  rgba(5,150,105,0.08);
+  --red:       #dc2626;
+  --red-bg:    rgba(220,38,38,0.08);
+  --yellow:    #d97706;
+  --yellow-bg: rgba(217,119,6,0.08);
+  --purple:    #7c3aed;
+  --orange:    #ea580c;
+  --shadow:    0 8px 32px rgba(0,0,0,0.10);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --glow:      0 0 0 1px rgba(5,150,105,0.12);
+}
+
+/* ═══════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background var(--transition), color var(--transition);
+}
+* { -webkit-overflow-scrolling: touch; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════ */
+.app-shell { display: flex; min-height: 100dvh; }
+
+/* ═══════════════════════════════════════════
+   LEFT NAV — slim icon rail
+   ═══════════════════════════════════════════ */
+.app-nav {
+  width: var(--nav-w);
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0 12px;
+  gap: 2px;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: background var(--transition), border-color var(--transition);
+}
+.nav-logo {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 800;
+  background: linear-gradient(180deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.06em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 6px 0 14px;
+  margin-bottom: 6px;
+}
+.nav-btn {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text3);
+  transition: all var(--transition);
+  border: none; background: transparent;
+  font-size: 18px;
+  position: relative;
+}
+.nav-btn:hover { background: var(--bg3); color: var(--text2); }
+.nav-btn.active {
+  background: rgba(96,239,188,0.08);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(96,239,188,0.15);
+}
+[data-theme="light"] .nav-btn.active {
+  background: rgba(5,150,105,0.08);
+  box-shadow: inset 0 0 0 1px rgba(5,150,105,0.15);
+}
+.nav-btn .nav-tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%; transform: translateY(-50%);
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-size: 11px;
+  font-family: var(--mono);
+  padding: 5px 10px;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition);
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
+}
+.nav-btn:hover .nav-tooltip { opacity: 1; }
+.nav-divider { width: 28px; height: 1px; background: var(--border); margin: 4px 0; }
+.nav-spacer { flex: 1; }
+
+/* ═══════════════════════════════════════════
+   MAIN AREA
+   ═══════════════════════════════════════════ */
+.app-main { margin-left: var(--nav-w); flex: 1; display: flex; min-height: 100dvh; }
+.view { display: none; flex: 1; flex-direction: column; }
+.view.active { display: flex; }
+
+/* ═══════════════════════════════════════════
+   HOME VIEW
+   ═══════════════════════════════════════════ */
+.home-view {
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+.home-card {
+  width: 100%;
+  max-width: 640px;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 36px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.home-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  border-radius: var(--radius2) var(--radius2) 0 0;
+}
+.home-title {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.home-title span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.home-sub { color: var(--text3); font-size: 12px; margin-bottom: 28px; font-family: var(--mono); }
+.label {
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+textarea.json-input {
+  width: 100%;
+  height: 180px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 12px 14px;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  line-height: 1.55;
+}
+textarea.json-input:focus {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+textarea.json-input::placeholder { color: var(--text3); }
+
+/* ═══════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  text-transform: uppercase;
+  min-height: var(--touch);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent2) 0%, #1d4ed8 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(59,130,246,0.35);
+}
+.btn-primary:hover { filter: brightness(1.12); box-shadow: 0 4px 18px rgba(59,130,246,0.45); }
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--border2);
+  color: var(--text2);
+}
+.btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(59,130,246,0.06); }
+.btn-danger { background: transparent; border: 1.5px solid var(--red); color: var(--red); }
+.btn-danger:hover { background: var(--red-bg); }
+.btn-warn { background: transparent; border: 1.5px solid var(--orange); color: var(--orange); }
+.btn-warn:hover { background: rgba(249,115,22,0.08); }
+.btn-sm { padding: 7px 14px; font-size: 10.5px; min-height: 36px; }
+.btn-anki { background: transparent; border: 1.5px solid var(--yellow); color: var(--yellow); }
+.btn-anki:hover { background: var(--yellow-bg); }
+.btn:active { transform: scale(0.97); }
+.home-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+/* ═══════════════════════════════════════════
+   FORM ELEMENTS (shared)
+   ═══════════════════════════════════════════ */
+.error-msg {
+  background: var(--red-bg);
+  border: 1.5px solid var(--red);
+  color: var(--red);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-family: var(--mono);
+  margin-top: 12px;
+  display: none;
+}
+.error-msg.show { display: block; }
+
+.validation-report {
+  margin-top: 12px;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: none;
+}
+.validation-report.show { display: block; }
+.vr-header {
+  padding: 8px 14px;
+  background: var(--bg3);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vr-header.warn { color: var(--yellow); }
+.vr-header.ok { color: var(--green); }
+.vr-body { padding: 10px 14px; }
+.vr-item { font-family: var(--mono); font-size: 11px; color: var(--text2); padding: 3px 0; border-bottom: 1px solid var(--border); }
+.vr-item:last-child { border-bottom: none; }
+.vr-item.issue { color: var(--yellow); }
+.vr-item.ok { color: var(--green); }
+
+/* ═══════════════════════════════════════════
+   QUIZ VIEW
+   ═══════════════════════════════════════════ */
+.quiz-view { flex-direction: row; }
+
+/* Sidebar */
+.quiz-sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+  transition: background var(--transition), border-color var(--transition);
+}
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-title {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 12px;
+}
+.score-bar-wrap { margin-bottom: 10px; }
+.score-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text3);
+  margin-bottom: 5px;
+}
+.score-bar-track { height: 5px; background: var(--bg4); border-radius: 99px; overflow: hidden; }
+.score-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.4s ease; }
+.sidebar-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.stat-chip {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  padding: 8px 4px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.stat-chip .val { font-family: var(--mono); font-size: 16px; font-weight: 700; display: block; line-height: 1; margin-bottom: 3px; }
+.stat-chip .lbl { font-size: 9px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.07em; text-transform: uppercase; }
+.stat-chip.correct .val { color: var(--green); }
+.stat-chip.incorrect .val { color: var(--red); }
+.stat-chip.flagged .val { color: var(--yellow); }
+
+.sidebar-filter {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.filter-btn {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 9px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--bg3);
+  border: 1.5px solid transparent;
+  color: var(--text3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: center;
+  min-height: 32px;
+}
+.filter-btn:hover { color: var(--text2); border-color: var(--border2); }
+.filter-btn.active { background: var(--bg4); border-color: var(--accent2); color: var(--accent2); }
+
+.question-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  align-content: start;
+}
+.q-dot {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 1.5px solid transparent;
+  background: var(--bg3);
+  color: var(--text3);
+  position: relative;
+}
+.q-dot:hover { border-color: var(--border2); color: var(--text2); transform: scale(1.08); }
+.q-dot.active { border-color: var(--accent); color: var(--accent); background: rgba(96,239,188,0.08); }
+.q-dot.correct { background: var(--green-bg); color: var(--green); border-color: rgba(52,211,153,0.3); }
+.q-dot.incorrect { background: var(--red-bg); color: var(--red); border-color: rgba(251,113,133,0.3); }
+.q-dot.flagged::after {
+  content: '';
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 4px; height: 4px;
+  background: var(--yellow);
+  border-radius: 50%;
+}
+
+.sidebar-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.sidebar-footer .btn { flex: 1; justify-content: center; }
+
+/* Quiz panel */
+.quiz-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.quiz-header {
+  padding: 13px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg1);
+  flex-shrink: 0;
+  position: relative;
+}
+.quiz-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent2), transparent 70%);
+  opacity: 0.4;
+}
+.q-counter { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+.q-counter strong { color: var(--text); font-size: 14px; font-weight: 700; }
+
+/* Badges */
+.badge-base {
+  font-size: 9.5px;
+  font-family: var(--mono);
+  padding: 3px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: none;
+  font-weight: 600;
+}
+.diff-badge { font-size: 9.5px; font-family: var(--mono); padding: 3px 8px; border-radius: 99px; letter-spacing: 0.06em; text-transform: uppercase; display: none; font-weight: 600; }
+.diff-badge.show { display: inline-flex; }
+.diff-badge.easy { background: var(--green-bg); border: 1.5px solid rgba(52,211,153,0.3); color: var(--green); }
+.diff-badge.medium { background: var(--yellow-bg); border: 1.5px solid rgba(251,191,36,0.3); color: var(--yellow); }
+.diff-badge.hard { background: var(--red-bg); border: 1.5px solid rgba(251,113,133,0.3); color: var(--red); }
+
+.adversarial-badge {
+  font-size: 9.5px; font-family: var(--mono); padding: 3px 8px; border-radius: 99px;
+  letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
+  background: rgba(192,132,252,0.12); border: 1.5px solid rgba(192,132,252,0.3); color: var(--purple); display: none;
+}
+.adversarial-badge.show { display: inline-flex; }
+.review-badge {
+  font-size: 9.5px; font-family: var(--mono); padding: 3px 8px; border-radius: 99px;
+  letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
+  background: var(--yellow-bg); border: 1.5px solid rgba(251,191,36,0.3); color: var(--yellow); display: none;
+}
+.review-badge.show { display: inline-flex; }
+.archetype-badge {
+  font-size: 9.5px; font-family: var(--mono); padding: 3px 8px; border-radius: 99px;
+  letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
+  background: rgba(59,130,246,0.10); border: 1.5px solid rgba(59,130,246,0.25); color: var(--accent2); display: none;
+}
+.archetype-badge.show { display: inline-flex; }
+
+.header-spacer { flex: 1; }
+.flag-btn {
+  background: transparent;
+  border: 1.5px solid var(--border2);
+  color: var(--text3);
+  border-radius: var(--radius);
+  padding: 7px 13px;
+  font-family: var(--mono);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition);
+  min-height: 36px;
+}
+.flag-btn:hover { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-bg); }
+.flag-btn.flagged { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-bg); }
+
+.nav-arrows { display: flex; gap: 6px; }
+.arrow-btn {
+  width: 38px; height: 38px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+}
+.arrow-btn:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(59,130,246,0.08); }
+.arrow-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+/* Question content */
+.quiz-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 36px;
+  max-width: 820px;
+  width: 100%;
+  margin: 0 auto;
+}
+.q-archetype-label { font-size: 10px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; display: none; }
+.q-archetype-label.show { display: block; }
+.q-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 14px; }
+.q-tag {
+  font-size: 10px; font-family: var(--mono); padding: 3px 9px;
+  border-radius: 99px; background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text3); letter-spacing: 0.04em; font-weight: 500;
+}
+.q-text { font-size: 16px; font-weight: 400; line-height: 1.75; color: var(--text); margin-bottom: 24px; }
+
+.near-miss-note {
+  margin-bottom: 12px; padding: 9px 13px;
+  background: var(--yellow-bg); border: 1.5px solid rgba(251,191,36,0.25);
+  border-radius: var(--radius); font-family: var(--mono); font-size: 11px; color: var(--yellow); display: none;
+}
+.near-miss-note.show { display: block; }
+
+.options-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+.option-card {
+  display: flex; align-items: flex-start; gap: 13px;
+  padding: 15px 17px; border-radius: var(--radius2);
+  border: 1.5px solid var(--border2); background: var(--bg2);
+  cursor: pointer; transition: all var(--transition);
+  user-select: none; position: relative; min-height: 52px;
+}
+.option-card:hover:not(.disabled) {
+  border-color: var(--accent2); background: rgba(59,130,246,0.05);
+  transform: translateX(3px);
+  box-shadow: var(--shadow-sm);
+}
+.option-card.disabled { cursor: default; }
+.option-card.selected { border-color: var(--accent2); background: rgba(59,130,246,0.08); box-shadow: 0 0 0 1px rgba(59,130,246,0.15); }
+.option-card.correct-ans { border-color: var(--green); background: var(--green-bg); box-shadow: 0 0 0 1px rgba(52,211,153,0.2); }
+.option-card.wrong-ans { border-color: var(--red); background: var(--red-bg); box-shadow: 0 0 0 1px rgba(251,113,133,0.2); }
+.option-card .near-miss-dot { position: absolute; top: 8px; right: 11px; font-size: 9px; font-family: var(--mono); color: var(--yellow); opacity: 0; font-weight: 600; }
+.option-card.near-miss-shown .near-miss-dot { opacity: 1; }
+.option-key {
+  width: 30px; height: 30px; min-width: 30px; border-radius: 50%;
+  background: var(--bg4); border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  color: var(--text3); transition: all var(--transition); text-transform: uppercase;
+}
+.option-card.selected .option-key { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.option-card.correct-ans .option-key { background: var(--green); border-color: var(--green); color: #fff; }
+.option-card.wrong-ans .option-key { background: var(--red); border-color: var(--red); color: #fff; }
+.option-text { font-size: 14px; line-height: 1.65; color: var(--text2); padding-top: 3px; flex: 1; }
+.option-card.selected .option-text, .option-card.correct-ans .option-text, .option-card.wrong-ans .option-text { color: var(--text); }
+
+/* Explanation */
+.explanation-panel {
+  background: var(--bg2); border: 1.5px solid var(--border2); border-radius: var(--radius2);
+  overflow: hidden; margin-top: 8px; animation: slideIn 0.22s ease;
+}
+@keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.explanation-header { padding: 11px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.explanation-icon { font-size: 14px; font-weight: 700; }
+.explanation-label { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.explanation-icon.correct, .explanation-label.correct { color: var(--green); }
+.explanation-icon.incorrect, .explanation-label.incorrect { color: var(--red); }
+.explanation-body { padding: 16px; font-size: 13.5px; line-height: 1.75; color: var(--text2); }
+
+.distractor-analysis { margin-top: 14px; padding: 13px; background: var(--bg3); border-radius: var(--radius); border: 1px solid var(--border); }
+.da-title { font-family: var(--mono); font-size: 9.5px; font-weight: 700; color: var(--text3); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 10px; }
+.da-row { display: flex; gap: 8px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; font-family: var(--mono); }
+.da-row:last-child { border-bottom: none; }
+.da-key { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
+.da-key.correct { background: var(--green-bg); color: var(--green); }
+.da-key.wrong { background: var(--red-bg); color: var(--red); }
+.da-text { color: var(--text2); line-height: 1.5; flex: 1; }
+.da-similarity { margin-left: auto; font-size: 10px; color: var(--text3); white-space: nowrap; padding-top: 2px; }
+
+/* ═══════════════════════════════════════════
+   PATTERN WARNING
+   ═══════════════════════════════════════════ */
+.pattern-warning {
+  margin: 10px 14px; padding: 8px 11px;
+  background: var(--yellow-bg); border: 1.5px solid rgba(251,191,36,0.25);
+  border-radius: var(--radius); font-family: var(--mono); font-size: 10px;
+  color: var(--yellow); display: none;
+}
+.pattern-warning.show { display: block; }
+
+/* ═══════════════════════════════════════════
+   PROMPT BUILDER VIEW
+   ═══════════════════════════════════════════ */
+.prompt-view { flex-direction: row; }
+.prompt-config {
+  width: 420px; min-width: 360px;
+  background: var(--bg1); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  height: 100dvh; overflow: hidden; position: sticky; top: 0;
+  transition: background var(--transition), border-color var(--transition);
+}
+.prompt-config-inner { flex: 1; overflow-y: auto; padding: 22px; }
+.prompt-output-area { flex: 1; display: flex; flex-direction: column; padding: 22px; overflow: hidden; }
+.section-title { font-family: var(--display); font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+.section-sub { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-bottom: 20px; }
+.form-group { margin-bottom: 18px; }
+
+.mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mode-opt {
+  padding: 11px 10px; border-radius: var(--radius);
+  border: 1.5px solid var(--border2); background: var(--bg2);
+  cursor: pointer; text-align: center; transition: all var(--transition);
+}
+.mode-opt:hover { background: var(--bg3); }
+.mode-opt.active { border-color: var(--accent2); background: rgba(59,130,246,0.08); box-shadow: 0 0 0 1px rgba(59,130,246,0.1); }
+.mode-opt .mode-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+.mode-opt .mode-label { font-size: 10.5px; font-family: var(--mono); color: var(--text2); font-weight: 600; }
+.mode-opt.active .mode-label { color: var(--accent2); }
+
+.select-input, .text-input, .num-input {
+  width: 100%; background: var(--bg2); border: 1.5px solid var(--border2);
+  color: var(--text); border-radius: var(--radius); padding: 10px 13px;
+  font-family: var(--mono); font-size: 12px; outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition); -webkit-appearance: none;
+}
+.select-input:focus, .text-input:focus, .num-input:focus {
+  border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+.select-input option { background: var(--bg2); }
+
+.range-wrap { display: flex; align-items: center; gap: 12px; }
+.range-input {
+  flex: 1; -webkit-appearance: none; height: 5px;
+  background: var(--bg4); border-radius: 99px; outline: none;
+}
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--accent2); cursor: pointer;
+  border: 2px solid var(--bg1); box-shadow: 0 1px 6px rgba(59,130,246,0.4);
+}
+.range-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--accent2); min-width: 28px; text-align: right; }
+
+.qtype-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.qtype-opt {
+  padding: 8px 10px; border-radius: var(--radius); border: 1.5px solid var(--border2);
+  background: var(--bg2); cursor: pointer; font-size: 10.5px; font-family: var(--mono);
+  color: var(--text3); transition: all var(--transition); font-weight: 500;
+}
+.qtype-opt:hover { color: var(--text2); background: var(--bg3); border-color: var(--border2); }
+.qtype-opt.active { border-color: var(--purple); background: rgba(192,132,252,0.1); color: var(--purple); }
+
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 12px; color: var(--text2); font-family: var(--mono); }
+.toggle-switch {
+  width: 40px; height: 22px;
+  border-radius: 99px; background: var(--bg4); border: 1.5px solid var(--border2);
+  cursor: pointer; position: relative; transition: all 0.25s ease; flex-shrink: 0;
+}
+.toggle-switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--text3); transition: all 0.25s ease;
+}
+.toggle-switch.on { background: rgba(59,130,246,0.25); border-color: var(--accent2); }
+.toggle-switch.on::after { left: 20px; background: var(--accent2); }
+
+textarea.notes-input {
+  width: 100%; height: 110px; background: var(--bg2); border: 1.5px solid var(--border2);
+  border-radius: var(--radius); color: var(--text); font-family: var(--mono); font-size: 11px;
+  padding: 10px 12px; resize: vertical; outline: none;
+  transition: border-color var(--transition); line-height: 1.5;
+}
+textarea.notes-input:focus { border-color: var(--accent2); }
+textarea.notes-input::placeholder { color: var(--text3); }
+
+.prompt-config-footer { padding: 14px 22px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+/* Preset section */
+.preset-bar {
+  display: flex; gap: 6px; align-items: center;
+  padding: 10px 0; border-top: 1px solid var(--border); margin-top: 6px;
+}
+.preset-label { font-size: 10px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; }
+.preset-chips { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; }
+.preset-chip {
+  padding: 4px 10px; font-size: 10.5px; font-family: var(--mono);
+  border-radius: 99px; border: 1.5px solid var(--border2);
+  background: var(--bg3); color: var(--text3); cursor: pointer;
+  transition: all var(--transition); display: flex; align-items: center; gap: 5px;
+}
+.preset-chip:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(59,130,246,0.06); }
+.preset-chip .del-preset { color: var(--text3); font-size: 11px; line-height: 1; }
+.preset-chip:hover .del-preset { color: var(--red); }
+.preset-save-btn {
+  padding: 4px 10px; font-size: 10.5px; font-family: var(--mono);
+  border-radius: 99px; border: 1.5px solid var(--border2);
+  background: transparent; color: var(--text3); cursor: pointer;
+  transition: all var(--transition); white-space: nowrap;
+}
+.preset-save-btn:hover { border-color: var(--green); color: var(--green); }
+
+/* Prompt output */
+.output-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.output-title { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--text); }
+.output-spacer { flex: 1; }
+.copy-feedback { font-family: var(--mono); font-size: 11px; color: var(--green); opacity: 0; transition: opacity 0.2s; }
+.copy-feedback.show { opacity: 1; }
+.prompt-tab-row { display: flex; gap: 6px; margin-bottom: 14px; }
+.prompt-tab {
+  flex: 1; padding: 8px 10px; border-radius: var(--radius);
+  border: 1.5px solid var(--border2); background: var(--bg2);
+  font-family: var(--mono); font-size: 11px; color: var(--text3);
+  cursor: pointer; text-align: center; transition: all var(--transition); font-weight: 500;
+}
+.prompt-tab:hover { color: var(--text2); background: var(--bg3); }
+.prompt-tab.active { border-color: var(--accent2); background: rgba(59,130,246,0.08); color: var(--accent2); }
+.prompt-output-box {
+  flex: 1; overflow-y: auto; background: var(--bg2);
+  border: 1.5px solid var(--border2); border-radius: var(--radius2);
+  padding: 16px; font-family: var(--mono); font-size: 11.5px;
+  line-height: 1.7; color: var(--text2); white-space: pre-wrap; word-break: break-word;
+}
+.prompt-output-box .ph { color: var(--text3); }
+
+/* ═══════════════════════════════════════════
+   RESULTS VIEW
+   ═══════════════════════════════════════════ */
+.results-view { overflow-y: auto; padding: 32px 36px; }
+.results-card { max-width: 720px; margin: 0 auto; }
+.results-hero {
+  background: var(--bg1); border: 1.5px solid var(--border); border-radius: var(--radius2);
+  padding: 32px; text-align: center; margin-bottom: 16px;
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+}
+.results-hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+}
+.score-circle {
+  width: 110px; height: 110px; border-radius: 50%;
+  border: 4px solid var(--accent2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 0 auto 18px; position: relative;
+  box-shadow: 0 0 0 8px rgba(59,130,246,0.08);
+}
+.score-pct { font-family: var(--display); font-size: 30px; font-weight: 800; color: var(--text); line-height: 1; }
+.score-pct-sub { font-size: 9px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; }
+.results-grade { font-family: var(--display); font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.results-sub { font-size: 12px; color: var(--text3); font-family: var(--mono); }
+
+.results-stats {
+  background: var(--bg1); border: 1.5px solid var(--border); border-radius: var(--radius2);
+  padding: 22px 28px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+  margin-bottom: 16px; box-shadow: var(--shadow-sm);
+}
+.result-stat { text-align: center; }
+.result-stat .rs-val { font-family: var(--mono); font-size: 24px; font-weight: 700; display: block; margin-bottom: 3px; }
+.result-stat .rs-lbl { font-size: 10px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.07em; text-transform: uppercase; }
+.result-stat.c .rs-val { color: var(--green); }
+.result-stat.i .rs-val { color: var(--red); }
+.result-stat.s .rs-val { color: var(--accent2); }
+
+.results-analysis {
+  background: var(--bg1); border: 1.5px solid var(--border); border-radius: var(--radius2);
+  padding: 18px 22px; margin-bottom: 16px; box-shadow: var(--shadow-sm);
+}
+.ra-title { font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 12px; }
+.ra-distribution { display: flex; gap: 6px; align-items: flex-end; height: 44px; margin-bottom: 10px; }
+.ra-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.ra-bar { width: 100%; background: var(--bg3); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.4s ease; }
+.ra-bar.high { background: linear-gradient(180deg, var(--yellow), var(--orange)); }
+.ra-bar-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; }
+.ra-warnings { font-family: var(--mono); font-size: 11px; color: var(--yellow); margin-top: 8px; line-height: 1.7; }
+.ra-ok { font-family: var(--mono); font-size: 11px; color: var(--green); margin-top: 8px; }
+
+.results-actions {
+  background: var(--bg1); border: 1.5px solid var(--border); border-radius: var(--radius2);
+  padding: 18px 22px; display: flex; flex-direction: column; gap: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.results-actions .btn { justify-content: center; }
+
+/* ═══════════════════════════════════════════
+   EMPTY STATES
+   ═══════════════════════════════════════════ */
+.no-quiz-overlay {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 14px; color: var(--text3); padding: 40px;
+}
+.no-quiz-overlay .ico { font-size: 42px; opacity: 0.3; }
+.no-quiz-overlay p { font-family: var(--mono); font-size: 13px; text-align: center; max-width: 300px; line-height: 1.7; }
+
+/* ═══════════════════════════════════════════
+   UTILITY
+   ═══════════════════════════════════════════ */
+.hidden { display: none !important; }
+.mt8 { margin-top: 8px; }
+.mt4 { margin-top: 4px; }
+
+.diff-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.diff-btn {
+  padding: 9px 8px; border-radius: var(--radius);
+  border: 1.5px solid var(--border2); background: var(--bg2);
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  color: var(--text3); cursor: pointer; text-align: center; transition: all var(--transition);
+  min-height: 38px;
+}
+.diff-btn:hover { color: var(--text2); background: var(--bg3); }
+.diff-btn.active[data-d="easy"] { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+.diff-btn.active[data-d="medium"] { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-bg); }
+.diff-btn.active[data-d="hard"] { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+/* ═══════════════════════════════════════════
+   LIBRARY VIEW
+   ═══════════════════════════════════════════ */
+.library-view { padding: 28px 32px; overflow-y: auto; }
+.library-header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 24px; }
+.library-title { font-family: var(--display); font-size: 22px; font-weight: 800; color: var(--text); }
+.library-count { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+.library-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: var(--text3); padding: 70px 40px; text-align: center; }
+.library-empty .ico { font-size: 42px; opacity: 0.3; }
+.library-empty p { font-family: var(--mono); font-size: 13px; line-height: 1.7; max-width: 280px; }
+.quiz-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.quiz-card {
+  background: var(--bg1); border: 1.5px solid var(--border); border-radius: var(--radius2);
+  padding: 20px; cursor: pointer; transition: all var(--transition); position: relative; overflow: hidden;
+}
+.quiz-card:hover { border-color: var(--border2); background: var(--bg2); transform: translateY(-2px); box-shadow: var(--shadow); }
+.quiz-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  opacity: 0; transition: opacity var(--transition);
+}
+.quiz-card:hover::before { opacity: 1; }
+.qc-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qc-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+.qc-meta-item { font-family: var(--mono); font-size: 10px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+.qc-progress-wrap { margin-bottom: 12px; }
+.qc-progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.qc-progress-label { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+.qc-progress-pct { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent2); }
+.qc-bar-track { height: 4px; background: var(--bg4); border-radius: 99px; overflow: hidden; }
+.qc-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
+.qc-stats { display: flex; gap: 6px; margin-bottom: 16px; }
+.qc-stat { flex: 1; background: var(--bg3); border-radius: var(--radius); padding: 7px 4px; text-align: center; }
+.qc-stat .sv { font-family: var(--mono); font-size: 14px; font-weight: 700; display: block; line-height: 1.2; }
+.qc-stat .sl { font-size: 9px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.qc-stat.sc .sv { color: var(--green); }
+.qc-stat.si .sv { color: var(--red); }
+.qc-stat.sf .sv { color: var(--yellow); }
+.qc-actions { display: flex; gap: 6px; }
+.qc-actions .btn { flex: 1; justify-content: center; }
+.qc-saved-time { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-top: 10px; text-align: right; }
+
+/* Autosave */
+.autosave-indicator { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
+.autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); transition: background 0.3s; flex-shrink: 0; }
+.autosave-dot.saving { background: var(--yellow); animation: pulse 0.6s infinite alternate; }
+.autosave-dot.saved { background: var(--green); }
+@keyframes pulse { from { opacity:1; } to { opacity:0.3; } }
+.autosave-text { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Anki badge */
+.anki-badge {
+  position: absolute; top: 4px; right: 4px;
+  background: var(--yellow); color: var(--bg);
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  border-radius: 99px; padding: 1px 5px; min-width: 16px; text-align: center; display: none;
+}
+.anki-badge.show { display: block; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(16px);
+  background: var(--bg4); border: 1.5px solid var(--border2);
+  color: var(--text); font-family: var(--mono); font-size: 12px;
+  padding: 10px 20px; border-radius: var(--radius2);
+  opacity: 0; pointer-events: none; transition: all 0.25s ease;
+  z-index: 9999; display: flex; align-items: center; gap: 8px;
+  box-shadow: var(--shadow);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+/* Mobile sidebar toggle */
+.mobile-sidebar-toggle {
+  display: none; position: fixed; bottom: 72px; right: 18px;
+  width: 52px; height: 52px;
+  background: var(--bg3); color: var(--text2);
+  border: 1.5px solid var(--border2); border-radius: 50%;
+  font-size: 20px; cursor: pointer;
+  align-items: center; justify-content: center;
+  z-index: 200; box-shadow: var(--shadow);
+}
+.mobile-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 150; }
+.mobile-sidebar-overlay.show { display: block; }
+
+/* Prompt config mobile */
+.prompt-config-toggle {
+  display: none; position: fixed; bottom: 72px; right: 18px;
+  width: 54px; height: 54px;
+  background: linear-gradient(135deg, var(--accent2), #1d4ed8);
+  color: #fff; border: none; border-radius: 50%; font-size: 22px; cursor: pointer;
+  align-items: center; justify-content: center; z-index: 200;
+  box-shadow: 0 4px 20px rgba(59,130,246,0.5);
+}
+.prompt-config-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 155; }
+.prompt-config-overlay.show { display: block; }
+
+/* ═══════════════════════════════════════════
+   THEME TOGGLE BUTTON
+   ═══════════════════════════════════════════ */
+.theme-toggle {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius); cursor: pointer; color: var(--text3);
+  transition: all var(--transition); border: none; background: transparent;
+  font-size: 18px;
+}
+.theme-toggle:hover { background: var(--bg3); color: var(--text2); }
+
+/* ═══════════════════════════════════════════
+   SETTINGS VIEW
+   ═══════════════════════════════════════════ */
+.settings-view { overflow-y: auto; padding: 28px 24px; }
+.settings-container { max-width: 660px; margin: 0 auto; }
+.settings-page-title {
+  font-family: var(--display); font-size: 20px; font-weight: 800;
+  color: var(--text); margin-bottom: 22px;
+  display: flex; align-items: center; gap: 10px;
+}
+.settings-card {
+  background: var(--bg1); border: 1.5px solid var(--border);
+  border-radius: var(--radius2); margin-bottom: 16px;
+  overflow: hidden; box-shadow: var(--shadow-sm);
+}
+.settings-card-danger { border-color: rgba(251,113,133,0.25); }
+.settings-card-header {
+  padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+  border-bottom: 1px solid var(--border); background: var(--bg2);
+}
+.settings-card-icon { font-size: 20px; flex-shrink: 0; }
+.settings-card-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--text); }
+.settings-card-sub { font-size: 11px; font-family: var(--mono); color: var(--text3); margin-top: 2px; }
+.settings-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+}
+.settings-row-info { flex: 1; min-width: 0; }
+.settings-row-label { font-size: 13px; color: var(--text); font-weight: 500; margin-bottom: 2px; }
+.settings-row-sub { font-size: 11px; font-family: var(--mono); color: var(--text3); }
+.settings-divider { height: 1px; background: var(--border); margin: 0 20px; }
+
+/* Sync status dot */
+.sync-status-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--text3); flex-shrink: 0; margin-left: auto;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.sync-status-dot.syncing { background: var(--yellow); animation: pulse 0.8s infinite alternate; box-shadow: 0 0 6px rgba(251,191,36,0.5); }
+.sync-status-dot.synced  { background: var(--green);  box-shadow: 0 0 6px rgba(52,211,153,0.4); }
+.sync-status-dot.error   { background: var(--red);    box-shadow: 0 0 6px rgba(251,113,133,0.4); }
+.sync-status-dot.offline { background: var(--text3); }
+
+/* Sync progress bar */
+.sync-progress-bar {
+  margin: 0 20px 14px; height: 4px;
+  background: var(--bg4); border-radius: 99px; overflow: hidden;
+}
+.sync-progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 99px; transition: width 0.4s ease;
+}
+
+/* ═══════════════════════════════════════════
+   SYNC INDICATOR (persistent mini badge in nav)
+   ═══════════════════════════════════════════ */
+.nav-sync-badge {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); display: none;
+  box-shadow: 0 0 4px rgba(52,211,153,0.6);
+}
+.nav-sync-badge.show { display: block; }
+.nav-sync-badge.syncing { background: var(--yellow); animation: pulse 0.8s infinite alternate; }
+.nav-sync-badge.error { background: var(--red); }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — settings
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 1100px) and (min-width: 701px) {
+  .quiz-sidebar { width: 220px; --sidebar-w: 220px; }
+  .prompt-config { width: 340px; min-width: 300px; }
+  .quiz-content { padding: 22px 26px; }
+}
+@media (max-width: 900px) {
+  .quiz-sidebar { width: 200px; --sidebar-w: 200px; }
+  .quiz-content { padding: 20px; }
+  .prompt-config { width: 310px; min-width: 280px; }
+}
+
+@media (max-width: 700px) {
+  html { font-size: 15px; }
+
+  .app-nav {
+    width: 100% !important;
+    height: 60px; flex-direction: row;
+    top: auto; bottom: 0; left: 0; right: 0; padding: 0 4px;
+    border-right: none; border-top: 1px solid var(--border);
+    background: rgba(11,13,17,0.96);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    justify-content: space-around; align-items: center; z-index: 300;
+  }
+  [data-theme="light"] .app-nav { background: rgba(255,255,255,0.96); }
+  .nav-logo { display: none; }
+  .nav-divider { display: none; }
+  .nav-spacer { display: none; }
+  .nav-btn { width: 52px; height: 52px; }
+  .nav-btn .nav-tooltip { display: none; }
+  .theme-toggle { width: 52px; height: 52px; }
+
+  .app-main { margin-left: 0 !important; padding-bottom: 60px; }
+
+  .home-view { padding: 18px 14px; }
+  .home-card { padding: 22px 16px; }
+  .home-title { font-size: 25px; }
+  .home-sub { font-size: 11px; margin-bottom: 20px; }
+  .home-actions { flex-direction: column; }
+  .home-actions .btn { width: 100%; justify-content: center; }
+  textarea.json-input { height: 140px; }
+
+  .quiz-view { flex-direction: column; height: auto; overflow: visible; }
+  .quiz-sidebar {
+    position: fixed; left: 0; top: 0; bottom: 60px; z-index: 160;
+    transform: translateX(-110%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    width: 84vw; max-width: 300px; height: auto;
+    box-shadow: 6px 0 32px rgba(0,0,0,0.6);
+  }
+  .quiz-sidebar.mobile-open { transform: translateX(0); }
+  .mobile-sidebar-toggle { display: flex; }
+  .quiz-panel { overflow: visible; }
+  .quiz-content { padding: 16px 14px; max-width: 100%; }
+  .quiz-header { padding: 11px 14px; flex-wrap: wrap; gap: 8px; }
+  .q-text { font-size: 15px; margin-bottom: 20px; }
+  .option-card { padding: 14px 15px; gap: 12px; }
+  .option-key { width: 32px; height: 32px; min-width: 32px; }
+  .option-text { font-size: 13.5px; }
+  .arrow-btn { width: 42px; height: 42px; }
+
+  .prompt-view { flex-direction: column !important; height: auto; overflow: visible; }
+  .prompt-config {
+    position: fixed; left: 0; top: 0; bottom: 60px; z-index: 160;
+    width: 90vw; max-width: 360px; min-width: unset;
+    height: auto; transform: translateX(-110%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 6px 0 32px rgba(0,0,0,0.6);
+  }
+  .prompt-config.open { transform: translateX(0); }
+  .prompt-output-area { flex: 1; padding: 16px 14px; display: flex; flex-direction: column; min-height: calc(100dvh - 60px); }
+  .prompt-output-box { flex: 1; min-height: 260px; font-size: 11px; }
+  .prompt-config-toggle { display: flex; }
+
+  .results-view { padding: 16px 12px; }
+  .results-card { max-width: 100%; }
+  .results-hero { padding: 22px 16px; }
+  .results-stats { padding: 16px 14px; gap: 12px; }
+  .results-analysis { padding: 14px; }
+  .results-actions { padding: 14px; }
+  .results-actions .btn { width: 100%; }
+
+  .library-view { padding: 18px 14px; }
+
+  .settings-view { padding: 16px 12px; }
+  .settings-card-header { padding: 13px 14px; }
+  .settings-row { padding: 12px 14px; flex-wrap: wrap; }
+  .settings-divider { margin: 0 14px; }
+
+  .btn { padding: 11px 16px; }
+  .btn-sm { padding: 7px 12px; }
+  .section-title { font-size: 16px; }
+  .toast { bottom: 70px; }
+  .diff-btn { min-height: 42px; }
+
+  .archetype-badge, .adversarial-badge, .review-badge { display: none !important; }
+  .diff-badge.show { display: inline-flex; }
+  .sidebar-footer .btn { padding: 9px 8px; font-size: 10px; }
+  .mode-toggle { grid-template-columns: 1fr 1fr; }
+  .qtype-grid { grid-template-columns: 1fr 1fr; }
+  .prompt-config-footer { padding: 12px 16px; }
+  .preset-bar { flex-wrap: wrap; }
+}
+</style>
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json"/>
+  <meta name="theme-color" content="#000000"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <meta name="apple-mobile-web-app-title" content="TESTIT"/>
+  <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
+  <!-- PWA inline SW registration -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("./sw.js")
+          .then(reg => {
+            console.log("SW registered:", reg.scope);
+            reg.addEventListener("updatefound", function() {
+              const newWorker = reg.installing;
+              newWorker.addEventListener("statechange", function() {
+                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                  if (confirm("TESTIT update available. Reload?")) location.reload();
+                }
+              });
+            });
+          })
+          .catch(err => console.warn("SW error:", err));
+        // Listen for background sync signal from SW
+        navigator.serviceWorker.addEventListener("message", function(e) {
+          if (e.data && e.data.type === "BACKGROUND_SYNC" && window.syncManager) {
+            if (navigator.onLine && window.syncManager.isSignedIn && window.syncManager.isSignedIn()) {
+              window.syncManager.syncNow();
+            }
+          }
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- LEFT NAV -->
+  <nav class="app-nav">
+    <div class="nav-logo">TEST<br>IT</div>
+
+    <button class="nav-btn active" id="nav-home" onclick="showView('home')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="nav-tooltip">Load Quiz</span>
+    </button>
+
+    <button class="nav-btn" id="nav-library" onclick="showView('library')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span class="nav-tooltip">Saved Quizzes</span>
+    </button>
+
+    <button class="nav-btn" id="nav-quiz" onclick="showView('quiz')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span class="nav-tooltip">Take Quiz</span>
+    </button>
+
+    <button class="nav-btn" id="nav-prompt" onclick="showView('prompt')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <span class="nav-tooltip">AI Prompt Builder</span>
+    </button>
+
+    <div class="nav-spacer"></div>
+
+    <button class="nav-btn" id="nav-results" onclick="showView('results')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="nav-tooltip">Results</span>
+    </button>
+
+    <button class="nav-btn" id="nav-settings" onclick="showView('settings')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="nav-tooltip">Settings &amp; Sync</span>
+    </button>
+  </nav>
+
+  <!-- Mobile sidebar toggle (quiz view) -->
+  <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle" onclick="toggleMobileSidebar()" style="display:none">☰</button>
+  <div class="mobile-sidebar-overlay" id="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+  <!-- MAIN -->
+  <main class="app-main">
+
+    <!-- ===================== HOME VIEW ===================== -->
+    <section class="view home-view active" id="view-home">
+      <div class="home-card">
+        <div class="home-title">TEST<span>IT</span></div>
+        <div class="home-sub">// professional mcq engine — paste json to begin</div>
+
+        <label class="label">Paste Quiz JSON</label>
+        <textarea class="json-input" id="json-input" placeholder='{
+  "title": "My Quiz",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the powerhouse of the cell?",
+      "options": { "a": "Nucleus", "b": "Ribosome", "c": "Mitochondria", "d": "Golgi" },
+      "correct_answer": "c",
+      "explanation": "Mitochondria produce ATP via oxidative phosphorylation.",
+      "tags": ["biology", "cell"],
+      "difficulty": "easy",
+      "archetype": "Standard"
+    }
+  ]
+}'></textarea>
+
+        <div id="json-error" class="error-msg"></div>
+
+        <!-- Validation report area -->
+        <div class="validation-report" id="validation-report">
+          <div class="vr-header" id="vr-header">
+            <span id="vr-header-icon">⚠</span>
+            <span id="vr-header-text">Validation Report</span>
+          </div>
+          <div class="vr-body" id="vr-body"></div>
+        </div>
+
+        <div class="home-actions">
+          <button class="btn btn-primary" onclick="loadQuiz()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+            Load Quiz
+          </button>
+          <button class="btn btn-ghost" onclick="loadSample()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Load Sample
+          </button>
+        </div>
+
+        <div style="margin-top:28px; padding-top:20px; border-top: 1px solid var(--border);">
+          <div class="label">Or generate questions with AI</div>
+          <p style="font-size:12px; color:var(--text3); margin-bottom:12px; line-height:1.6;">
+            Use the <strong style="color:var(--text2)">Prompt Builder</strong> to generate a professional exam-grade system prompt, paste it into Claude, ChatGPT, or any LLM, then load the returned JSON here.
+          </p>
+          <button class="btn btn-ghost" onclick="showView('prompt')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Open Prompt Builder →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LIBRARY VIEW ============ -->
+    <section class="view library-view" id="view-library">
+      <div class="library-header">
+        <div class="library-title">Saved Quizzes</div>
+        <div class="library-count" id="library-count"></div>
+      </div>
+      <div id="library-empty" class="library-empty" style="display:none">
+        <div class="ico">📚</div>
+        <p>No saved quizzes yet.<br>Load a quiz and it will automatically be saved here with your progress.</p>
+        <button class="btn btn-ghost btn-sm" onclick="showView('home')">Load a Quiz</button>
+      </div>
+      <div class="quiz-cards" id="quiz-cards"></div>
+    </section>
+
+    <!-- ===================== QUIZ VIEW ===================== -->
+    <section class="view quiz-view" id="view-quiz">
+
+      <!-- no quiz loaded -->
+      <div class="no-quiz-overlay" id="no-quiz-msg">
+        <div class="ico">📋</div>
+        <p>No quiz loaded yet.<br>Head to <strong style="color:var(--text2)">Load Quiz</strong> and paste your JSON to begin.</p>
+        <button class="btn btn-ghost btn-sm" onclick="showView('home')">Load Quiz</button>
+      </div>
+
+      <!-- quiz content (hidden until loaded) -->
+      <div id="quiz-content-wrap" class="hidden" style="display:contents">
+
+        <!-- sidebar -->
+        <aside class="quiz-sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-title" id="quiz-title">Quiz Title</div>
+            <div class="score-bar-wrap">
+              <div class="score-bar-label">
+                <span>Accuracy</span>
+                <span id="accuracy-pct">0%</span>
+              </div>
+              <div class="score-bar-track">
+                <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
+              </div>
+            </div>
+            <div class="sidebar-stats">
+              <div class="stat-chip correct"><span class="val" id="stat-correct">0</span><span class="lbl">Correct</span></div>
+              <div class="stat-chip incorrect"><span class="val" id="stat-incorrect">0</span><span class="lbl">Wrong</span></div>
+              <div class="stat-chip flagged"><span class="val" id="stat-flagged">0</span><span class="lbl">Flagged</span></div>
+            </div>
+          </div>
+
+          <div class="autosave-indicator">
+            <div class="autosave-dot" id="autosave-dot"></div>
+            <span class="autosave-text" id="autosave-text">Auto-save on</span>
+          </div>
+
+          <!-- Answer pattern warning in sidebar -->
+          <div class="pattern-warning" id="sidebar-pattern-warning"></div>
+
+          <div class="sidebar-filter">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+            <button class="filter-btn" data-filter="incorrect" onclick="setFilter('incorrect')">Wrong</button>
+            <button class="filter-btn" data-filter="flagged" onclick="setFilter('flagged')">⚑</button>
+          </div>
+
+          <div class="question-grid" id="question-grid"></div>
+
+          <div class="sidebar-footer">
+            <button class="btn btn-ghost btn-sm" onclick="resetQuiz()">Reset</button>
+            <button class="btn btn-ghost btn-sm" onclick="showView('results')">Results</button>
+            <button class="btn btn-anki btn-sm" onclick="exportAnkiCSV()" title="Export wrong answers to Anki CSV">
+              ↓ Anki (<span id="anki-count-sidebar">0</span>)
+            </button>
+          </div>
+        </aside>
+
+        <!-- main panel -->
+        <div class="quiz-panel">
+          <div class="quiz-header">
+            <span class="q-counter">Q <strong id="q-num">1</strong> / <span id="q-total">0</span></span>
+            <div class="review-badge" id="review-badge">Review Mode</div>
+            <div class="diff-badge" id="diff-badge"></div>
+            <div class="adversarial-badge" id="adversarial-badge">⚡ Adversarial</div>
+            <div class="archetype-badge" id="archetype-badge"></div>
+            <div class="header-spacer"></div>
+            <button class="flag-btn" id="flag-btn" onclick="toggleFlag()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              Flag
+            </button>
+            <div class="nav-arrows">
+              <button class="arrow-btn" id="btn-prev" onclick="navigate(-1)">&#8592;</button>
+              <button class="arrow-btn" id="btn-next" onclick="navigate(1)">&#8594;</button>
+            </div>
+          </div>
+
+          <div class="quiz-content" id="quiz-content"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== PROMPT VIEW ===================== -->
+    <section class="view prompt-view" id="view-prompt">
+
+      <!-- Mobile: floating button to open config panel -->
+      <button class="prompt-config-toggle" id="prompt-config-toggle" onclick="openPromptConfig()" title="Configure">⚙</button>
+      <div class="prompt-config-overlay" id="prompt-config-overlay" onclick="closePromptConfig()"></div>
+
+      <!-- config panel -->
+      <div class="prompt-config" id="prompt-config-panel">
+        <div class="prompt-config-inner">
+          <div class="section-title">Prompt Builder</div>
+          <div class="section-sub">// configure → generate → paste into LLM</div>
+
+          <!-- Mode -->
+          <div class="form-group">
+            <span class="label">Mode</span>
+            <div class="mode-toggle">
+              <div class="mode-opt active" data-mode="topic" onclick="setMode('topic')">
+                <span class="mode-icon">🎯</span>
+                <span class="mode-label">Topic-based</span>
+              </div>
+              <div class="mode-opt" data-mode="material" onclick="setMode('material')">
+                <span class="mode-icon">📄</span>
+                <span class="mode-label">Material-based</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Topic field -->
+          <div class="form-group" id="topic-field">
+            <span class="label">Topic</span>
+            <input class="text-input" id="p-topic" type="text" placeholder="e.g. Cell Biology, World War II, SQL Joins..."/>
+          </div>
+
+          <!-- Material field -->
+          <div class="form-group hidden" id="material-field">
+            <span class="label">Paste Your Notes / Material</span>
+            <textarea class="notes-input" id="p-material" placeholder="Paste text, notes, or excerpts here..."></textarea>
+          </div>
+
+          <!-- Difficulty -->
+          <div class="form-group">
+            <span class="label">Difficulty</span>
+            <div class="diff-btns">
+              <button class="diff-btn active" data-d="easy" onclick="setDiff('easy')">Easy</button>
+              <button class="diff-btn" data-d="medium" onclick="setDiff('medium')">Medium</button>
+              <button class="diff-btn" data-d="hard" onclick="setDiff('hard')">Hard</button>
+            </div>
+          </div>
+
+          <!-- Count -->
+          <div class="form-group">
+            <span class="label">Question Count</span>
+            <div class="range-wrap">
+              <input class="range-input" type="range" min="1" max="50" value="10"
+                id="p-count" oninput="document.getElementById('p-count-val').textContent=this.value"/>
+              <span class="range-val" id="p-count-val">10</span>
+            </div>
+          </div>
+
+          <!-- Options per question -->
+          <div class="form-group">
+            <span class="label">Options Per Question</span>
+            <div class="range-wrap">
+              <input class="range-input" type="range" min="2" max="6" value="4"
+                id="p-opts" oninput="document.getElementById('p-opts-val').textContent=this.value"/>
+              <span class="range-val" id="p-opts-val">4</span>
+            </div>
+          </div>
+
+          <!-- Question types — expanded with all 12 archetypes -->
+          <div class="form-group">
+            <span class="label">Question Archetypes</span>
+            <div class="qtype-grid" id="qtype-grid">
+              <div class="qtype-opt active" data-qt="Standard" onclick="toggleQtype(this)">Standard</div>
+              <div class="qtype-opt" data-qt="Best Next Step" onclick="toggleQtype(this)">Best Next Step</div>
+              <div class="qtype-opt" data-qt="Comparative Analysis" onclick="toggleQtype(this)">Comparative</div>
+              <div class="qtype-opt" data-qt="Mechanism Identification" onclick="toggleQtype(this)">Mechanism</div>
+              <div class="qtype-opt" data-qt="Assertion-Reason" onclick="toggleQtype(this)">Assertion-Reason</div>
+              <div class="qtype-opt" data-qt="Clinical Vignette" onclick="toggleQtype(this)">Vignette</div>
+              <div class="qtype-opt" data-qt="Multi-step Reasoning" onclick="toggleQtype(this)">Multi-step</div>
+              <div class="qtype-opt" data-qt="Error Finding" onclick="toggleQtype(this)">Error Finding</div>
+              <div class="qtype-opt" data-qt="Negation" onclick="toggleQtype(this)">Negation</div>
+              <div class="qtype-opt" data-qt="Scenario-Based" onclick="toggleQtype(this)">Scenario</div>
+              <div class="qtype-opt" data-qt="Chronological" onclick="toggleQtype(this)">Chronological</div>
+              <div class="qtype-opt" data-qt="Conceptual Discrimination" onclick="toggleQtype(this)">Conceptual</div>
+            </div>
+          </div>
+
+          <!-- Toggles -->
+          <div class="form-group">
+            <span class="label">Options</span>
+            <div class="toggle-row">
+              <span class="toggle-label">Include Explanations</span>
+              <div class="toggle-switch on" id="tog-explanations" onclick="toggleSwitch('tog-explanations')"></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Include Tags</span>
+              <div class="toggle-switch on" id="tog-tags" onclick="toggleSwitch('tog-tags')"></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Adversarial Mode</span>
+              <div class="toggle-switch" id="tog-adversarial" onclick="toggleSwitch('tog-adversarial')"></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Near-Miss Distractors</span>
+              <div class="toggle-switch on" id="tog-nearmiss" onclick="toggleSwitch('tog-nearmiss')"></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">AI Critic Pass</span>
+              <div class="toggle-switch on" id="tog-critic" onclick="toggleSwitch('tog-critic')"></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Distractor Analysis</span>
+              <div class="toggle-switch on" id="tog-da" onclick="toggleSwitch('tog-da')"></div>
+            </div>
+          </div>
+
+          <!-- Extra instructions -->
+          <div class="form-group">
+            <span class="label">Extra Instructions</span>
+            <textarea class="notes-input" id="p-extra" placeholder="e.g. Focus on clinical applications. Use near-miss distractors. Simulate USMLE-style vignettes."></textarea>
+          </div>
+
+        </div>
+        <div class="prompt-config-footer">
+          <!-- Preset bar -->
+          <div class="preset-bar">
+            <span class="preset-label">Presets</span>
+            <div class="preset-chips" id="preset-chips"></div>
+            <button class="preset-save-btn" onclick="savePreset()">+ Save</button>
+          </div>
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;" onclick="closePromptConfig();switchPromptTab('gen');generatePrompt()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Generate Prompt
+          </button>
+        </div>
+      </div>
+
+      <!-- output panel -->
+      <div class="prompt-output-area">
+        <div class="output-header">
+          <div class="output-title">Generated Prompt</div>
+          <div class="output-spacer"></div>
+          <span class="copy-feedback" id="copy-feedback">✓ Copied!</span>
+          <button class="btn btn-ghost btn-sm" onclick="copyPrompt()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <div class="prompt-tab-row">
+          <div class="prompt-tab active" id="ptab-gen" onclick="switchPromptTab('gen')">Generator Prompt</div>
+          <div class="prompt-tab" id="ptab-critic" onclick="switchPromptTab('critic')">Critic Prompt</div>
+        </div>
+        <div class="prompt-output-box" id="prompt-output">
+          <span class="ph">← Configure options and click Generate Prompt to build your AI system prompt.
+
+The prompt will be formatted for Claude, ChatGPT, or any LLM.
+Paste it as the system prompt, then paste the JSON response back into the Load Quiz page.</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===================== RESULTS VIEW ===================== -->
+    <section class="view results-view" id="view-results">
+      <div class="no-quiz-overlay" id="no-results-msg">
+        <div class="ico">📊</div>
+        <p>No session data yet.<br>Complete some questions to see your results.</p>
+        <button class="btn btn-ghost btn-sm" onclick="showView('home')">Load Quiz</button>
+      </div>
+
+      <div class="results-card hidden" id="results-card">
+        <div class="results-hero">
+          <div class="score-circle">
+            <div class="score-pct" id="r-pct">0%</div>
+            <div class="score-pct-sub">accuracy</div>
+          </div>
+          <div class="results-grade" id="r-grade">—</div>
+          <div class="results-sub" id="r-sub">complete more questions</div>
+        </div>
+        <div class="results-stats">
+          <div class="result-stat c"><span class="rs-val" id="r-correct">0</span><span class="rs-lbl">Correct</span></div>
+          <div class="result-stat i"><span class="rs-val" id="r-incorrect">0</span><span class="rs-lbl">Incorrect</span></div>
+          <div class="result-stat s"><span class="rs-val" id="r-total">0</span><span class="rs-lbl">Attempted</span></div>
+        </div>
+
+        <!-- Answer pattern analysis -->
+        <div class="results-analysis" id="results-analysis">
+          <div class="ra-title">Answer Distribution Analysis</div>
+          <div class="ra-distribution" id="ra-distribution"></div>
+          <div id="ra-warnings"></div>
+        </div>
+
+        <div class="results-actions">
+          <button class="btn btn-primary" onclick="reviewIncorrect()">Review Incorrect Questions</button>
+          <button class="btn btn-anki" id="export-anki-btn" onclick="exportAnkiCSV()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Wrong Answers (<span id="anki-count-results">0</span>)
+          </button>
+          <button class="btn btn-ghost" onclick="showView('quiz')">Continue Quiz</button>
+          <button class="btn btn-danger" onclick="resetQuiz()">Reset Session</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SETTINGS VIEW ===================== -->
+    <section class="view settings-view" id="view-settings">
+      <div class="settings-container">
+
+        <div class="settings-page-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Settings &amp; Sync
+        </div>
+
+        <!-- SYNC SECTION -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">☁</span>
+            <div>
+              <div class="settings-card-title">Cloud Sync</div>
+              <div class="settings-card-sub">Sync via Google Drive — your data, your account</div>
+            </div>
+            <div class="sync-status-dot" id="sync-status-dot"></div>
+          </div>
+
+          <!-- Auth row -->
+          <div class="settings-row" id="sync-auth-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label" id="sync-user-label">Not signed in</div>
+              <div class="settings-row-sub" id="sync-user-email">Sign in to enable cross-device sync</div>
+            </div>
+            <button class="btn btn-primary btn-sm" id="sync-signin-btn" onclick="syncManager.signIn()">Sign In with Google</button>
+            <button class="btn btn-ghost btn-sm hidden" id="sync-signout-btn" onclick="syncManager.signOut()">Sign Out</button>
+          </div>
+
+          <!-- Sync controls (shown when signed in) -->
+          <div id="sync-controls" class="hidden">
+            <div class="settings-divider"></div>
+            <div class="settings-row">
+              <div class="settings-row-info">
+                <div class="settings-row-label">Last Sync</div>
+                <div class="settings-row-sub" id="sync-last-time">Never</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="sync-now-btn" onclick="syncManager.syncNow()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+                Sync Now
+              </button>
+            </div>
+            <div class="sync-progress-bar hidden" id="sync-progress-bar">
+              <div class="sync-progress-fill" id="sync-progress-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BACKUP SECTION -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">💾</span>
+            <div>
+              <div class="settings-card-title">Backup &amp; Restore</div>
+              <div class="settings-card-sub">Export and import your complete data</div>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Export Backup</div>
+              <div class="settings-row-sub">Download a full JSON backup of all data</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="backupManager.exportBackup()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Import Backup</div>
+              <div class="settings-row-sub">Restore from a previously exported file</div>
+            </div>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Import
+              <input type="file" accept=".json" style="display:none" onchange="backupManager.importBackup(event)">
+            </label>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Restore Previous Backup</div>
+              <div class="settings-row-sub" id="prev-backup-info">No previous backup stored</div>
+            </div>
+            <button class="btn btn-warn btn-sm" id="restore-prev-btn" onclick="backupManager.restorePreviousBackup()" disabled>Restore</button>
+          </div>
+        </div>
+
+        <!-- DATABASE SECTION -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">🗄</span>
+            <div>
+              <div class="settings-card-title">Local Database</div>
+              <div class="settings-card-sub">IndexedDB — all data stored on this device</div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Storage Usage</div>
+              <div class="settings-row-sub" id="db-usage">Calculating…</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="settingsView.refreshStats()">Refresh</button>
+          </div>
+          <div class="settings-divider"></div>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Quizzes Saved</div>
+              <div class="settings-row-sub" id="db-quiz-count">—</div>
+            </div>
+          </div>
+          <div class="settings-divider"></div>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Anki Deck Cards</div>
+              <div class="settings-row-sub" id="db-anki-count">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APPEARANCE SECTION -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">🎨</span>
+            <div>
+              <div class="settings-card-title">Appearance</div>
+              <div class="settings-card-sub">Theme and display preferences</div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Dark Mode</div>
+              <div class="settings-row-sub">AMOLED-optimised black backgrounds</div>
+            </div>
+            <div class="toggle-switch" id="theme-toggle-switch" onclick="settingsView.toggleThemeFromSwitch()"></div>
+          </div>
+        </div>
+
+        <!-- DANGER ZONE -->
+        <div class="settings-card settings-card-danger">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">⚠</span>
+            <div>
+              <div class="settings-card-title" style="color:var(--red)">Danger Zone</div>
+              <div class="settings-card-sub">Irreversible actions</div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">Clear All Local Data</div>
+              <div class="settings-row-sub">Wipes all quizzes, progress, and settings from this device</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="settingsView.confirmClearAll()">Clear All</button>
+          </div>
+        </div>
+
+        <div style="height:32px"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  TESTIT v4 — PWA Edition                                     ║
+// ║  Single-file PWA · PKCE OAuth · Offline-first               ║
+// ╚══════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════╗
+// ║   TESTIT v2 — Professional MCQ Engine                       ║
+// ║   Psychometric-grade quiz system with:                      ║
+// ║   • Fisher-Yates option scrambling                          ║
+// ║   • Question order randomization                            ║
+// ║   • Difficulty profiles                                     ║
+// ║   • Near-miss distractor detection                          ║
+// ║   • Adversarial exam mode                                   ║
+// ║   • Answer pattern analyzer                                 ║
+// ║   • Question validation engine                              ║
+// ║   • Distractor analysis in explanations                     ║
+// ║   • Professional prompt generation (12 archetypes)          ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+// ─────────────────────────────────────────
+//  CONFIGURATION — Difficulty Profiles
+//  Each profile controls nuance level,
+//  distractor similarity hints in prompts,
+//  and display behavior during quiz.
+// ─────────────────────────────────────────
+const DIFFICULTY_PROFILES = {
+  easy: {
+    label: 'Easy',
+    nuanceLevel: 1,
+    distractorSimilarity: 'Low — distractors are plausible but clearly wrong on reflection.',
+    ambiguity: 'Minimal ambiguity. One clearly correct answer.',
+    scenarioComplexity: 'Simple, direct scenarios.',
+    nearMissIntensity: 'Low. Distractors represent common misconceptions only.',
+    promptInstructions: 'Questions should test direct recall and basic application. Distractors should be plausible but distinctly incorrect upon careful reading.'
+  },
+  medium: {
+    label: 'Medium',
+    nuanceLevel: 2,
+    distractorSimilarity: 'Moderate — at least one distractor should be partially correct or a common trap.',
+    ambiguity: 'Some ambiguity requiring careful reading. Single best answer exists.',
+    scenarioComplexity: 'Moderate clinical or applied scenarios with 2–3 key variables.',
+    nearMissIntensity: 'Moderate. Include 1–2 near-miss distractors that test common confusions.',
+    promptInstructions: 'Questions should require application and analysis. At least one distractor must be a credible near-miss. Avoid obvious wrong answers.'
+  },
+  hard: {
+    label: 'Hard',
+    nuanceLevel: 3,
+    distractorSimilarity: 'High — multiple options are partially correct; the correct answer requires nuanced discrimination.',
+    ambiguity: 'Significant ambiguity. Requires elimination strategy and deep conceptual understanding.',
+    scenarioComplexity: 'Complex, multi-layered scenarios with confounding variables.',
+    nearMissIntensity: 'Maximum. All distractors must be plausible. At least 2–3 near-misses that would fool a partially prepared learner.',
+    promptInstructions: 'Questions must require synthesis-level reasoning. ALL distractors must be plausible to partially prepared learners. Correct answer must require deep conceptual discrimination. Surface memorization must be insufficient.'
+  }
+};
+
+// ─────────────────────────────────────────
+//  CONFIGURATION — Question Archetypes
+//  Each archetype maps to a specific
+//  cognitive demand level and prompt
+//  strategy for professional exams.
+// ─────────────────────────────────────────
+const ARCHETYPES = {
+  'Standard':                  { icon: '📝', desc: 'Direct knowledge question with single best answer.' },
+  'Best Next Step':            { icon: '▶', desc: 'Given a scenario, identify the most appropriate immediate action.' },
+  'Comparative Analysis':      { icon: '⚖', desc: 'Compare two or more concepts, mechanisms, or items on a key dimension.' },
+  'Mechanism Identification':  { icon: '⚙', desc: 'Identify the underlying mechanism, pathway, or process responsible for an outcome.' },
+  'Assertion-Reason':          { icon: '🔗', desc: 'Evaluate whether a reason correctly explains a given assertion.' },
+  'Clinical Vignette':         { icon: '🏥', desc: 'Case-based scenario requiring diagnosis, management, or interpretation.' },
+  'Multi-step Reasoning':      { icon: '🔢', desc: 'Problem requiring sequential logical steps to reach the correct answer.' },
+  'Error Finding':             { icon: '🔍', desc: 'Identify the incorrect statement or procedural error among options.' },
+  'Negation':                  { icon: '❌', desc: 'Select the option that does NOT apply (EXCEPT, NOT, FALSE type).' },
+  'Scenario-Based':            { icon: '🌐', desc: 'Applied scenario in a professional or real-world context.' },
+  'Chronological':             { icon: '🕐', desc: 'Sequence events, stages, or steps in correct temporal order.' },
+  'Conceptual Discrimination': { icon: '🎯', desc: 'Distinguish between closely related concepts that are commonly confused.' }
+};
+
+// ─────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────
+const state = {
+  quiz: null,
+  questions: [],       // Active (filtered) question list with scrambled options
+  allQuestions: [],    // All processed questions (options scrambled, order randomized)
+  originalQuestions: [], // Raw questions as loaded (pre-scramble, for saving)
+  currentIdx: 0,
+  answers: {},         // { qid: selectedKey } — keys refer to SCRAMBLED positions
+  flags: new Set(),
+  filter: 'all',
+  reviewMode: false,
+  activeSlot: null,
+  adversarialMode: false,
+  prompt: {
+    mode: 'topic',
+    difficulty: 'easy',
+    count: 10,
+    opts: 4,
+    qtypes: new Set(['Standard']),
+    explanations: true,
+    tags: true,
+    adversarial: false,
+    nearMiss: true,
+    critic: true,
+    distractorAnalysis: true
+  }
+};
+
+const LS_PREFIX = 'testit_quiz_';
+const LS_ANKI   = 'testit_anki_deck';
+let autosaveTimer = null;
+
+// ═══════════════════════════════════════════════════════
+//  ①  FISHER-YATES SHUFFLE
+//  Produces an unbiased random permutation of an array.
+//  Used for both option scrambling and question ordering.
+// ═══════════════════════════════════════════════════════
+function fisherYatesShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ═══════════════════════════════════════════════════════
+//  ②  OPTION SCRAMBLING ENGINE
+//  Takes a question object and returns a new object
+//  with options in randomised order. The correct_answer
+//  key is remapped to the new shuffled position.
+//  Original key ordering is NOT preserved — letters
+//  a/b/c/d are reassigned after shuffle.
+// ═══════════════════════════════════════════════════════
+function scrambleOptions(question) {
+  const origKeys = Object.keys(question.options);
+  const origValues = origKeys.map(k => ({ origKey: k, text: question.options[k] }));
+  const shuffled = fisherYatesShuffle(origValues);
+
+  const LABELS = ['a', 'b', 'c', 'd', 'e', 'f'];
+  const newOptions = {};
+  let newCorrectKey = '';
+
+  shuffled.forEach((item, idx) => {
+    const newKey = LABELS[idx] || String.fromCharCode(97 + idx);
+    newOptions[newKey] = item.text;
+    // Remap: if this item was the original correct answer, record its new label
+    if (item.origKey === question.correct_answer) {
+      newCorrectKey = newKey;
+    }
+  });
+
+  return {
+    ...question,
+    options: newOptions,
+    correct_answer: newCorrectKey,
+    // Preserve original for analytics/display
+    _origCorrect: question.correct_answer
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+//  ③  QUESTION SCRAMBLING
+//  Randomises question presentation order.
+//  Does NOT affect IDs or saved progress keys.
+// ═══════════════════════════════════════════════════════
+function scrambleQuestionOrder(questions) {
+  return fisherYatesShuffle(questions);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ④  QUESTION VALIDATION ENGINE
+//  Scans a question for psychometric quality issues.
+//  Returns { issues: string[], score: number (0–100) }
+//
+//  Detects:
+//  • Obvious distractors (very short / trivially wrong)
+//  • Duplicate or near-duplicate options
+//  • Excessive length imbalance between options
+//  • Grammatical clues in the stem ("an ___")
+//  • Semantic imbalance (one option vastly longer)
+//  • Repeated wording between stem and correct answer
+//  • Correct answer standing out in length
+// ═══════════════════════════════════════════════════════
+function validateQuestion(q) {
+  const issues = [];
+  const opts = Object.values(q.options);
+  const lengths = opts.map(o => o.length);
+  const avgLen = lengths.reduce((s, l) => s + l, 0) / lengths.length;
+  const correctText = q.options[q.correct_answer] || '';
+
+  // 1. Duplicate options
+  const unique = new Set(opts.map(o => o.trim().toLowerCase()));
+  if (unique.size < opts.length) {
+    issues.push('Duplicate or near-identical options detected.');
+  }
+
+  // 2. Trivially short distractors (< 4 chars — likely placeholder)
+  opts.forEach((o, i) => {
+    if (o.trim().length < 4) issues.push(`Option ${String.fromCharCode(97+i)} is suspiciously short ("${o}").`);
+  });
+
+  // 3. Excessive length imbalance: any option >3× or <⅓ of average
+  lengths.forEach((l, i) => {
+    if (l > avgLen * 3.5) issues.push(`Option ${String.fromCharCode(97+i)} is excessively long vs others — may cue correct answer.`);
+    if (avgLen > 15 && l < avgLen * 0.25) issues.push(`Option ${String.fromCharCode(97+i)} is disproportionately short — may be an obvious distractor.`);
+  });
+
+  // 4. Correct answer length outlier (classic tell — correct is longest)
+  const maxLen = Math.max(...lengths);
+  const correctLen = correctText.length;
+  if (correctLen === maxLen && correctLen > avgLen * 1.8) {
+    issues.push('Correct answer is significantly longer than distractors — this cues test-wise guessing.');
+  }
+
+  // 5. Stem wording repeated verbatim in correct answer
+  const stemWords = (q.question || '').toLowerCase().split(/\W+/).filter(w => w.length > 4);
+  const correctWords = correctText.toLowerCase().split(/\W+/).filter(w => w.length > 4);
+  const overlap = stemWords.filter(w => correctWords.includes(w));
+  if (overlap.length > 2) {
+    issues.push(`Stem words repeated in correct answer (${overlap.slice(0,3).join(', ')}) — may function as a clue.`);
+  }
+
+  // 6. All-of-the-above / None-of-the-above (low quality distractors)
+  opts.forEach(o => {
+    const lo = o.toLowerCase().trim();
+    if (lo === 'all of the above' || lo === 'none of the above' || lo === 'both a and b') {
+      issues.push(`"${o}" is a low-quality distractor — avoid generic catch-alls.`);
+    }
+  });
+
+  // Compute quality score (starts at 100, deduct per issue)
+  const score = Math.max(0, 100 - issues.length * 18);
+  return { issues, score };
+}
+
+// ═══════════════════════════════════════════════════════
+//  ⑤  BATCH VALIDATION (full quiz)
+//  Returns summary suitable for the UI report panel.
+// ═══════════════════════════════════════════════════════
+function validateQuiz(questions) {
+  const results = questions.map((q, i) => ({
+    idx: i + 1,
+    id: q.id,
+    ...validateQuestion(q)
+  }));
+  const totalIssues = results.reduce((s, r) => s + r.issues.length, 0);
+  const avgScore = Math.round(results.reduce((s, r) => s + r.score, 0) / results.length);
+  const flagged = results.filter(r => r.issues.length > 0);
+  return { results, totalIssues, avgScore, flagged };
+}
+
+// ═══════════════════════════════════════════════════════
+//  ⑥  ANSWER PATTERN ANALYZER
+//  Analyzes completed answers for:
+//  • Letter distribution (positional bias)
+//  • Dominant answer key > 40%
+//  • Streaks (3+ same keys in a row)
+//  Returns { distribution, warnings }
+// ═══════════════════════════════════════════════════════
+function analyzeAnswerPatterns(questions, answers) {
+  const dist = {}; // { 'a': count, 'b': count, ... }
+  const answered = questions.filter(q => answers[q.id] !== undefined);
+  if (answered.length === 0) return { distribution: {}, warnings: [] };
+
+  answered.forEach(q => {
+    const k = answers[q.id];
+    dist[k] = (dist[k] || 0) + 1;
+  });
+
+  const total = answered.length;
+  const warnings = [];
+
+  // Check for dominant key
+  Object.entries(dist).forEach(([key, count]) => {
+    const pct = (count / total) * 100;
+    if (pct > 40) {
+      warnings.push(`Answer "${key.toUpperCase()}" appeared in ${Math.round(pct)}% of your responses — possible positional bias in question set.`);
+    }
+  });
+
+  // Check for streaks in question order
+  const orderedAnswers = answered.map(q => answers[q.id]);
+  let streak = 1;
+  for (let i = 1; i < orderedAnswers.length; i++) {
+    if (orderedAnswers[i] === orderedAnswers[i-1]) {
+      streak++;
+      if (streak >= 4) {
+        warnings.push(`${streak} consecutive "${orderedAnswers[i].toUpperCase()}" answers detected — possible pattern in question design.`);
+        break;
+      }
+    } else {
+      streak = 1;
+    }
+  }
+
+  return { distribution: dist, warnings };
+}
+
+// ═══════════════════════════════════════════════════════
+//  ⑦  NEAR-MISS DISTRACTOR DETECTION
+//  For display purposes: after answering a question,
+//  identifies which distractors are "near-misses"
+//  (semantically close to correct answer) using
+//  simple heuristics: shared key terms, similar length.
+//  Returns array of near-miss option keys.
+// ═══════════════════════════════════════════════════════
+function detectNearMisses(question) {
+  const correctText = (question.options[question.correct_answer] || '').toLowerCase();
+  const correctWords = new Set(correctText.split(/\W+/).filter(w => w.length > 3));
+  const nearMisses = [];
+
+  Object.entries(question.options).forEach(([key, text]) => {
+    if (key === question.correct_answer) return;
+    const words = text.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+    const sharedWords = words.filter(w => correctWords.has(w));
+    const lenRatio = text.length / (correctText.length || 1);
+    // Near-miss if: 2+ shared significant words OR length ratio within 20%
+    if (sharedWords.length >= 2 || (lenRatio >= 0.8 && lenRatio <= 1.25 && sharedWords.length >= 1)) {
+      nearMisses.push(key);
+    }
+  });
+
+  return nearMisses;
+}
+
+// ═══════════════════════════════════════════════════════
+//  ⑧  ADVERSARIAL MODE CHECK
+//  In adversarial mode, after a wrong answer is
+//  submitted, generate a brief "trap analysis"
+//  explaining WHY the distractor was designed to mislead.
+//  This is a UI-only feature (no extra API call needed).
+// ═══════════════════════════════════════════════════════
+function getAdversarialTrap(question, selectedKey) {
+  if (!state.adversarialMode) return null;
+  if (selectedKey === question.correct_answer) return null;
+
+  const selectedText = question.options[selectedKey] || '';
+  const correctText = question.options[question.correct_answer] || '';
+
+  // Detect trap type based on similarity patterns
+  const selectedLower = selectedText.toLowerCase();
+  const correctLower = correctText.toLowerCase();
+
+  const sharedWords = selectedLower.split(/\W+/).filter(w =>
+    w.length > 3 && correctLower.includes(w)
+  );
+
+  let trapType = 'Superficial similarity trap';
+  let trapDesc = 'This option shares vocabulary with the correct answer but differs in a critical detail.';
+
+  if (selectedText.length > correctText.length * 1.4) {
+    trapType = 'Complexity-as-authority trap';
+    trapDesc = 'This option is more verbose and detailed, which can feel more "complete" — but correctness is not correlated with length.';
+  } else if (sharedWords.length >= 3) {
+    trapType = 'Shared-vocabulary near-miss trap';
+    trapDesc = `This option shares "${sharedWords.slice(0,2).join('", "')}" with the correct answer, making it feel correct superficially.`;
+  } else if (selectedText.length < correctText.length * 0.6) {
+    trapType = 'Oversimplification trap';
+    trapDesc = 'This option captures part of the correct concept but omits a key qualifying factor.';
+  }
+
+  return { trapType, trapDesc };
+}
+
+// ═══════════════════════════════════════════════════════
+//  ANKI CSV EXPORT — Wrong-answer persistent deck
+// ═══════════════════════════════════════════════════════
+function getAnkiDeck() {
+  try { return JSON.parse(localStorage.getItem(LS_ANKI)) || {}; } catch(e) { return {}; }
+}
+
+function saveAnkiDeck(deck) {
+  try { localStorage.setItem(LS_ANKI, JSON.stringify(deck)); } catch(e) {}
+}
+
+function ankiCardKey(q) {
+  // Use question id + first 30 chars of question text as dedupe key
+  return String(q.id) + '_' + (q.question || '').slice(0, 30).replace(/\W/g, '');
+}
+
+function addToAnkiDeck(q) {
+  const deck = getAnkiDeck();
+  const key = ankiCardKey(q);
+  if (deck[key]) return; // already exists — no duplicate
+  const keys = Object.keys(q.options);
+  const labels = ['A','B','C','D','E','F'];
+  const optionsHtml = keys.map((k, i) =>
+    (labels[i] || k.toUpperCase()) + '. ' + q.options[k]
+  ).join('<br>');
+  const front = q.question + '<br><br>' + optionsHtml;
+  const back = q.explanation || ('Correct answer: ' + q.correct_answer.toUpperCase() + '. ' + (q.options[q.correct_answer] || ''));
+  deck[key] = { front, back, addedAt: Date.now() };
+  saveAnkiDeck(deck);
+  updateAnkiCountDisplay();
+}
+
+function exportAnkiCSV() {
+  const deck = getAnkiDeck();
+  const entries = Object.values(deck);
+  if (!entries.length) { showToast('No wrong answers yet — deck is empty'); return; }
+  const escField = s => '"' + String(s).replace(/"/g, '""') + '"';
+  const rows = entries.map(e => escField(e.front) + '\t' + escField(e.back));
+  const csv = rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'testit_wrong_answers.txt';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Exported ' + entries.length + ' card(s) for Anki import');
+}
+
+function clearAnkiDeck() {
+  localStorage.removeItem(LS_ANKI);
+  updateAnkiCountDisplay();
+  showToast('Anki deck cleared');
+}
+
+function updateAnkiCountDisplay() {
+  const n = Object.keys(getAnkiDeck()).length;
+  ['anki-count-results','anki-count-sidebar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = n;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  MOBILE SIDEBAR
+// ═══════════════════════════════════════════════════════
+function toggleMobileSidebar() {
+  const sb = document.querySelector('.quiz-sidebar');
+  const ov = document.getElementById('mobile-sidebar-overlay');
+  if (!sb) return;
+  const open = sb.classList.toggle('mobile-open');
+  ov.classList.toggle('show', open);
+}
+
+function closeMobileSidebar() {
+  const sb = document.querySelector('.quiz-sidebar');
+  const ov = document.getElementById('mobile-sidebar-overlay');
+  if (sb) sb.classList.remove('mobile-open');
+  if (ov) ov.classList.remove('show');
+}
+
+function updateMobileToggleVisibility(hasQuiz) {
+  const btn = document.getElementById('mobile-sidebar-toggle');
+  if (!btn) return;
+  const isMobile = window.innerWidth <= 700;
+  btn.style.display = (isMobile && hasQuiz) ? 'flex' : 'none';
+  // Show/hide prompt config toggle based on current view
+  const promptToggle = document.getElementById('prompt-config-toggle');
+  if (promptToggle) {
+    const promptActive = document.getElementById('view-prompt') &&
+      document.getElementById('view-prompt').classList.contains('active');
+    promptToggle.style.display = (isMobile && promptActive) ? 'flex' : 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════════════
+function quizSlotKey(title, firstId) {
+  const safe = (title || 'untitled').replace(/[^a-z0-9]/gi, '_').toLowerCase().slice(0, 40);
+  return LS_PREFIX + safe + '_' + firstId;
+}
+
+function saveProgress() {
+  if (!state.quiz || !state.activeSlot) return;
+  showAutosaveDot('saving');
+  try {
+    const data = {
+      quiz: state.quiz,              // Original (un-scrambled) quiz JSON
+      answers: state.answers,
+      flags: [...state.flags],
+      currentIdx: state.currentIdx,
+      filter: state.filter,
+      reviewMode: state.reviewMode,
+      adversarialMode: state.adversarialMode,
+      savedAt: Date.now()
+    };
+    backupManager.touchLocalModified();
+    localStorage.setItem(state.activeSlot, JSON.stringify(data));
+    setTimeout(() => showAutosaveDot('saved'), 500);
+    // Schedule background cloud sync after local save
+    if (typeof syncManager !== 'undefined') syncManager.scheduleSync();
+  } catch(e) {
+    console.warn('Autosave failed:', e);
+  }
+}
+
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveProgress, 700);
+}
+
+function showAutosaveDot(status) {
+  const dot = document.getElementById('autosave-dot');
+  const txt = document.getElementById('autosave-text');
+  if (!dot) return;
+  dot.className = 'autosave-dot ' + status;
+  if (status === 'saving') txt.textContent = 'Saving...';
+  else if (status === 'saved') txt.textContent = 'Saved';
+  else txt.textContent = 'Auto-save on';
+}
+
+function getAllSavedSlots() {
+  const slots = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(LS_PREFIX)) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        if (data && data.quiz) slots.push({ key, data });
+      } catch(e) {}
+    }
+  }
+  slots.sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0));
+  return slots;
+}
+
+function deleteSlot(key) {
+  localStorage.removeItem(key);
+  if (state.activeSlot === key) state.activeSlot = null;
+  renderLibrary();
+  showToast('Quiz deleted');
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'quiz') renderQuizView();
+  if (name === 'results') renderResults();
+  if (name === 'library') renderLibrary();
+  if (name === 'settings') settingsView.onShow();
+  // Show/hide FABs
+  const isMobile = window.innerWidth <= 700;
+  const sidebarToggle = document.getElementById('mobile-sidebar-toggle');
+  if (sidebarToggle) sidebarToggle.style.display = (isMobile && name === 'quiz' && state.quiz) ? 'flex' : 'none';
+  const promptToggle = document.getElementById('prompt-config-toggle');
+  if (promptToggle) promptToggle.style.display = (isMobile && name === 'prompt') ? 'flex' : 'none';
+  // Close drawers when switching views
+  closeMobileSidebar();
+  closePromptConfig();
+}
+
+// ═══════════════════════════════════════════════════════
+//  QUIZ LOADING
+// ═══════════════════════════════════════════════════════
+function loadQuiz() {
+  const raw = document.getElementById('json-input').value.trim();
+  const err = document.getElementById('json-error');
+  err.classList.remove('show');
+  if (!raw) { err.textContent = 'Please paste a JSON quiz first.'; err.classList.add('show'); return; }
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed.questions || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+      throw new Error('No questions found or questions array is empty');
+    }
+
+    // Run validation before loading
+    const validation = validateQuiz(parsed.questions);
+    renderValidationReport(validation);
+
+    initQuiz(parsed, null);
+    showView('quiz');
+    showToast('Quiz loaded — options scrambled');
+  } catch(e) {
+    err.textContent = 'Invalid JSON: ' + e.message;
+    err.classList.add('show');
+  }
+}
+
+// ─────────────────────────────────────────
+//  Render validation report on home screen
+// ─────────────────────────────────────────
+function renderValidationReport(validation) {
+  const report = document.getElementById('validation-report');
+  const header = document.getElementById('vr-header');
+  const headerIcon = document.getElementById('vr-header-icon');
+  const headerText = document.getElementById('vr-header-text');
+  const body = document.getElementById('vr-body');
+
+  report.classList.add('show');
+
+  if (validation.totalIssues === 0) {
+    header.className = 'vr-header ok';
+    headerIcon.textContent = '✓';
+    headerText.textContent = `Validation passed — Quality score: ${validation.avgScore}/100`;
+    body.innerHTML = '<div class="vr-item ok">All questions passed psychometric quality checks.</div>';
+  } else {
+    header.className = 'vr-header warn';
+    headerIcon.textContent = '⚠';
+    headerText.textContent = `${validation.totalIssues} issue(s) found across ${validation.flagged.length} question(s) — Avg score: ${validation.avgScore}/100`;
+    body.innerHTML = validation.flagged.map(r =>
+      r.issues.map(iss => `<div class="vr-item issue">Q${r.idx}: ${iss}</div>`).join('')
+    ).join('');
+  }
+}
+
+// ─────────────────────────────────────────
+//  initQuiz: process questions with full
+//  scrambling pipeline, then set state.
+// ─────────────────────────────────────────
+function initQuiz(parsed, savedState) {
+  state.quiz = parsed;
+  state.originalQuestions = parsed.questions; // Keep original for saves
+
+  // Apply scrambling pipeline on a fresh load
+  // On resume (savedState), we re-scramble to present a fresh order —
+  // answers are keyed by question ID so correctness is preserved.
+  const scrambled = scrambleQuestionOrder(
+    parsed.questions.map(q => scrambleOptions(q))
+  );
+  state.allQuestions = scrambled;
+
+  if (savedState) {
+    state.answers = savedState.answers || {};
+    state.flags = new Set(savedState.flags || []);
+    state.currentIdx = savedState.currentIdx || 0;
+    state.filter = savedState.filter || 'all';
+    state.reviewMode = savedState.reviewMode || false;
+    state.adversarialMode = savedState.adversarialMode || false;
+  } else {
+    state.answers = {};
+    state.flags = new Set();
+    state.currentIdx = 0;
+    state.filter = 'all';
+    state.reviewMode = false;
+    state.adversarialMode = false;
+  }
+
+  const firstId = parsed.questions[0] ? parsed.questions[0].id : '0';
+  state.activeSlot = quizSlotKey(parsed.title, firstId);
+  state.questions = [...state.allQuestions];
+  saveProgress();
+}
+
+function loadFromSlot(key) {
+  try {
+    const data = JSON.parse(localStorage.getItem(key));
+    if (!data || !data.quiz) { showToast('Could not load saved quiz'); return; }
+    initQuiz(data.quiz, data);
+    showView('quiz');
+    const answered = Object.keys(data.answers || {}).length;
+    showToast(answered > 0 ? 'Quiz resumed' : 'Quiz loaded');
+  } catch(e) {
+    showToast('Failed to load saved quiz');
+  }
+}
+
+function loadSample() {
+  // High-quality sample demonstrating near-miss distractors and multiple archetypes
+  const sample = {
+    title: "Cell Biology — Professional Exam Sample",
+    questions: [
+      {
+        id: 1,
+        question: "A 45-year-old patient presents with muscle weakness and lactic acidosis. Genetic testing reveals a point mutation in a mitochondrial gene encoding a subunit of Complex I of the electron transport chain. Which of the following best explains the resulting cellular energy deficit?",
+        options: {
+          a: "Impaired hydrolysis of ATP by ATP synthase reduces the proton gradient across the inner mitochondrial membrane.",
+          b: "Reduced NADH oxidation decreases the proton gradient across the inner mitochondrial membrane, limiting ATP synthesis.",
+          c: "Blocked acetyl-CoA entry into the Krebs cycle prevents substrate-level phosphorylation in the mitochondrial matrix.",
+          d: "Disrupted outer mitochondrial membrane integrity causes cytochrome c release before oxidative phosphorylation occurs."
+        },
+        correct_answer: "b",
+        explanation: "Complex I (NADH dehydrogenase) is the first and largest complex of the ETC. It oxidises NADH and pumps protons across the inner mitochondrial membrane, contributing to the proton-motive force used by Complex V (ATP synthase) to drive ATP synthesis. A defect here reduces NADH oxidation and the proton gradient. Option A reverses cause and effect (ATP synthase synthesises, not hydrolyses, under normal conditions). Option C is incorrect because Complex I does not directly regulate acetyl-CoA entry; Krebs cycle substrate-level phosphorylation is only a small fraction of total ATP. Option D describes apoptosis, not the primary energy deficit.",
+        tags: ["mitochondria", "ETC", "oxidative phosphorylation", "vignette"],
+        difficulty: "hard",
+        archetype: "Clinical Vignette"
+      },
+      {
+        id: 2,
+        question: "Which of the following statements CORRECTLY distinguishes smooth ER function from rough ER function?",
+        options: {
+          a: "Smooth ER synthesises secretory proteins; rough ER synthesises lipids for membrane biogenesis.",
+          b: "Smooth ER detoxifies lipid-soluble compounds and stores calcium; rough ER synthesises membrane-bound and secretory proteins.",
+          c: "Both smooth and rough ER perform identical functions, differing only in their association with the Golgi apparatus.",
+          d: "Rough ER performs post-translational glycosylation of all cytosolic proteins; smooth ER performs no protein modification."
+        },
+        correct_answer: "b",
+        explanation: "The rough ER (studded with ribosomes) is responsible for synthesising proteins destined for secretion, membrane insertion, or organelles. The smooth ER lacks ribosomes and specialises in lipid synthesis, drug/toxin metabolism, and Ca²⁺ sequestration. Options A and D invert the roles. Option C is factually incorrect.",
+        tags: ["ER", "organelles", "cell biology"],
+        difficulty: "medium",
+        archetype: "Conceptual Discrimination"
+      },
+      {
+        id: 3,
+        question: "The Na⁺/K⁺-ATPase pump moves ions across the plasma membrane. Which of the following BEST describes the net electrochemical consequence of one complete pump cycle?",
+        options: {
+          a: "Net movement of one positive charge INTO the cell, slightly depolarising the membrane.",
+          b: "Net movement of one positive charge OUT OF the cell, contributing to membrane hyperpolarisation.",
+          c: "No net charge movement; the 3:2 ratio creates only a concentration gradient, not an electrical gradient.",
+          d: "Net movement of two positive charges OUT OF the cell, creating a strongly hyperpolarised resting potential."
+        },
+        correct_answer: "b",
+        explanation: "Each cycle ejects 3 Na⁺ (outward) and imports 2 K⁺ (inward), for a net export of one positive charge per cycle. This renders the pump electrogenic — it contributes a small but measurable hyperpolarising effect to the resting membrane potential. Option A reverses the direction. Option C incorrectly claims no electrical effect. Option D overstates the magnitude (2 charges, not 1).",
+        tags: ["membrane transport", "electrophysiology", "Na-K-ATPase"],
+        difficulty: "hard",
+        archetype: "Mechanism Identification"
+      },
+      {
+        id: 4,
+        question: "In the context of the cell cycle, arrange the following events in correct chronological order: (1) Condensation of chromosomes, (2) DNA replication, (3) Separation of sister chromatids, (4) Nuclear envelope reformation.",
+        options: {
+          a: "1 → 2 → 3 → 4",
+          b: "2 → 1 → 4 → 3",
+          c: "2 → 1 → 3 → 4",
+          d: "1 → 2 → 4 → 3"
+        },
+        correct_answer: "c",
+        explanation: "DNA replication (S phase) precedes chromosome condensation (prophase of mitosis). Sister chromatid separation occurs at anaphase, and nuclear envelope reformation occurs at telophase. The correct sequence is: S phase → Prophase → Anaphase → Telophase.",
+        tags: ["cell cycle", "mitosis", "chronological"],
+        difficulty: "medium",
+        archetype: "Chronological"
+      },
+      {
+        id: 5,
+        question: "A cell is placed in a solution and subsequently loses volume. EXCEPT for which of the following conditions would this observation be expected?",
+        options: {
+          a: "The extracellular solution has a higher solute concentration than the cell's cytoplasm.",
+          b: "The extracellular solution is hypertonic relative to the intracellular fluid.",
+          c: "The extracellular solution has a lower osmolarity than the cell's cytoplasm.",
+          d: "The extracellular solute cannot cross the plasma membrane."
+        },
+        correct_answer: "c",
+        explanation: "Cell shrinkage (crenation) occurs when water moves OUT by osmosis — i.e., when the extracellular environment is hypertonic (higher solute concentration, higher osmolarity) relative to the cell. Options A, B, and D all describe hypertonic conditions under which shrinkage would occur. Option C describes a HYPOTONIC condition (lower extracellular osmolarity), under which water would move INTO the cell, causing swelling — NOT shrinkage. This is therefore the exception.",
+        tags: ["osmosis", "tonicity", "negation"],
+        difficulty: "hard",
+        archetype: "Negation"
+      }
+    ]
+  };
+  document.getElementById('json-input').value = JSON.stringify(sample, null, 2);
+}
+
+// ═══════════════════════════════════════════════════════
+//  LIBRARY VIEW
+// ═══════════════════════════════════════════════════════
+function renderLibrary() {
+  const slots = getAllSavedSlots();
+  const countEl = document.getElementById('library-count');
+  const emptyEl = document.getElementById('library-empty');
+  const cardsEl = document.getElementById('quiz-cards');
+  if (!countEl) return;
+
+  countEl.textContent = slots.length ? slots.length + ' saved' : '';
+
+  if (!slots.length) {
+    emptyEl.style.display = 'flex';
+    cardsEl.innerHTML = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  cardsEl.innerHTML = slots.map(({ key, data }) => {
+    const q = data.quiz;
+    const total = q.questions.length;
+    const answered = Object.keys(data.answers || {}).length;
+    // For library view, compute correctness against original questions
+    const correct = q.questions.filter(qu => {
+      const userAns = (data.answers || {})[qu.id];
+      if (userAns === undefined) return false;
+      return userAns === qu.correct_answer;
+    }).length;
+    const incorrect = answered - correct;
+    const flagged = (data.flags || []).length;
+    const attemptPct = Math.round((answered / total) * 100);
+    const isActive = key === state.activeSlot;
+    const savedDate = data.savedAt ? new Date(data.savedAt).toLocaleString() : '—';
+    const escapedKey = key.replace(/'/g, "\\'");
+
+    return '<div class="quiz-card" style="' + (isActive ? 'border-color:var(--accent2);' : '') + '">' +
+      '<div class="qc-title">' + (q.title || 'Untitled Quiz') + '</div>' +
+      '<div class="qc-meta">' +
+        '<span class="qc-meta-item">' +
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/></svg>' +
+          total + ' questions' +
+        '</span>' +
+        '<span class="qc-meta-item">' +
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>' +
+          answered + '/' + total + ' done' +
+        '</span>' +
+        (isActive ? '<span class="qc-meta-item" style="color:var(--accent)">● Active</span>' : '') +
+      '</div>' +
+      '<div class="qc-progress-wrap">' +
+        '<div class="qc-progress-row">' +
+          '<span class="qc-progress-label">Progress</span>' +
+          '<span class="qc-progress-pct">' + attemptPct + '%</span>' +
+        '</div>' +
+        '<div class="qc-bar-track"><div class="qc-bar-fill" style="width:' + attemptPct + '%;background:var(--accent2)"></div></div>' +
+      '</div>' +
+      (answered > 0 ?
+        '<div class="qc-stats">' +
+          '<div class="qc-stat sc"><span class="sv">' + correct + '</span><span class="sl">Correct</span></div>' +
+          '<div class="qc-stat si"><span class="sv">' + incorrect + '</span><span class="sl">Wrong</span></div>' +
+          '<div class="qc-stat sf"><span class="sv">' + flagged + '</span><span class="sl">Flagged</span></div>' +
+        '</div>'
+        : '<div style="height:8px"></div>') +
+      '<div class="qc-actions">' +
+        '<button class="btn btn-primary btn-sm" onclick="loadFromSlot(\'' + escapedKey + '\')">' + (answered > 0 ? 'Resume' : 'Start') + '</button>' +
+        '<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteSlot(\'' + escapedKey + '\')">Delete</button>' +
+      '</div>' +
+      '<div class="qc-saved-time">Saved: ' + savedDate + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  QUIZ RENDER
+// ═══════════════════════════════════════════════════════
+function renderQuizView() {
+  const hasQuiz = state.quiz && state.allQuestions.length > 0;
+  document.getElementById('no-quiz-msg').style.display = hasQuiz ? 'none' : 'flex';
+  const wrap = document.getElementById('quiz-content-wrap');
+  if (!hasQuiz) { wrap.classList.add('hidden'); updateMobileToggleVisibility(false); return; }
+  wrap.classList.remove('hidden');
+  wrap.style.display = 'contents';
+  updateMobileToggleVisibility(true);
+  updateAnkiCountDisplay();
+  applyFilter();
+  renderSidebar();
+  renderQuestion();
+}
+
+function applyFilter() {
+  if (state.filter === 'all') {
+    state.questions = [...state.allQuestions];
+  } else if (state.filter === 'incorrect') {
+    const inc = state.allQuestions.filter(q => {
+      const a = state.answers[q.id];
+      return a !== undefined && a !== q.correct_answer;
+    });
+    state.questions = inc.length ? inc : [...state.allQuestions];
+  } else if (state.filter === 'flagged') {
+    const fl = state.allQuestions.filter(q => state.flags.has(q.id));
+    state.questions = fl.length ? fl : [...state.allQuestions];
+  }
+  if (state.currentIdx >= state.questions.length) state.currentIdx = 0;
+}
+
+function renderSidebar() {
+  if (!state.quiz) return;
+  document.getElementById('quiz-title').textContent = state.quiz.title || 'Untitled Quiz';
+
+  const answered = Object.keys(state.answers).length;
+  const correct = state.allQuestions.filter(q => state.answers[q.id] === q.correct_answer).length;
+  const incorrect = answered - correct;
+  const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+
+  document.getElementById('accuracy-pct').textContent = pct + '%';
+  document.getElementById('score-bar').style.width = pct + '%';
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-incorrect').textContent = incorrect;
+  document.getElementById('stat-flagged').textContent = state.flags.size;
+
+  // Answer pattern warning in sidebar
+  const patternWarn = document.getElementById('sidebar-pattern-warning');
+  if (answered >= 5) {
+    const { warnings } = analyzeAnswerPatterns(state.allQuestions, state.answers);
+    if (warnings.length > 0) {
+      patternWarn.textContent = '⚠ ' + warnings[0];
+      patternWarn.classList.add('show');
+    } else {
+      patternWarn.classList.remove('show');
+    }
+  }
+
+  const grid = document.getElementById('question-grid');
+  grid.innerHTML = '';
+  state.questions.forEach((q, i) => {
+    const a = state.answers[q.id];
+    let cls = '';
+    if (a !== undefined) cls = a === q.correct_answer ? 'correct' : 'incorrect';
+    if (i === state.currentIdx) cls += ' active';
+    const flagged = state.flags.has(q.id) ? ' flagged' : '';
+    const dot = document.createElement('div');
+    dot.className = 'q-dot ' + cls + flagged;
+    dot.textContent = i + 1;
+    dot.onclick = () => { state.currentIdx = i; renderQuestion(); renderSidebar(); };
+    grid.appendChild(dot);
+  });
+}
+
+// ─────────────────────────────────────────
+//  Core question renderer
+// ─────────────────────────────────────────
+function renderQuestion() {
+  if (!state.questions.length) return;
+  const q = state.questions[state.currentIdx];
+  const ans = state.answers[q.id];
+  const isAnswered = ans !== undefined;
+
+  document.getElementById('q-num').textContent = state.currentIdx + 1;
+  document.getElementById('q-total').textContent = state.questions.length;
+  document.getElementById('review-badge').classList.toggle('show', state.reviewMode);
+
+  // Adversarial badge
+  const advBadge = document.getElementById('adversarial-badge');
+  advBadge.classList.toggle('show', state.adversarialMode);
+
+  // Difficulty badge (per-question if available, else skip)
+  const diffBadge = document.getElementById('diff-badge');
+  if (q.difficulty) {
+    diffBadge.textContent = q.difficulty;
+    diffBadge.className = 'diff-badge show ' + q.difficulty;
+  } else {
+    diffBadge.className = 'diff-badge';
+  }
+
+  // Archetype badge
+  const archBadge = document.getElementById('archetype-badge');
+  if (q.archetype) {
+    const a = ARCHETYPES[q.archetype];
+    archBadge.textContent = (a ? a.icon + ' ' : '') + q.archetype;
+    archBadge.classList.add('show');
+  } else {
+    archBadge.classList.remove('show');
+  }
+
+  const flagBtn = document.getElementById('flag-btn');
+  const isFlagged = state.flags.has(q.id);
+  flagBtn.classList.toggle('flagged', isFlagged);
+  flagBtn.innerHTML =
+    '<svg width="12" height="12" viewBox="0 0 24 24" fill="' + (isFlagged ? 'var(--yellow)' : 'none') + '" stroke="currentColor" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>' +
+    (isFlagged ? 'Flagged' : 'Flag');
+
+  document.getElementById('btn-prev').disabled = state.currentIdx === 0;
+  document.getElementById('btn-next').disabled = state.currentIdx === state.questions.length - 1;
+
+  const content = document.getElementById('quiz-content');
+  const tagsHtml = (q.tags || []).map(t => '<span class="q-tag">' + t + '</span>').join('');
+
+  // Detect near-misses (for display after answering)
+  const nearMisses = isAnswered ? detectNearMisses(q) : [];
+
+  // Options
+  let optionsHtml = '';
+  Object.entries(q.options).forEach(([key, text]) => {
+    let cls = 'option-card';
+    if (isAnswered) {
+      cls += ' disabled';
+      if (key === q.correct_answer) cls += ' correct-ans';
+      else if (key === ans) cls += ' wrong-ans';
+      // Mark near-miss distractors after answering
+      if (nearMisses.includes(key) && key !== q.correct_answer && key !== ans) {
+        cls += ' near-miss-shown';
+      }
+    }
+    const nearMissDot = (isAnswered && nearMisses.includes(key) && key !== q.correct_answer && key !== ans)
+      ? '<span class="near-miss-dot">near-miss</span>'
+      : '';
+    optionsHtml +=
+      '<div class="' + cls + '" onclick="selectAnswer(\'' + q.id + '\', \'' + key + '\')">' +
+      '<div class="option-key">' + key + '</div>' +
+      '<div class="option-text">' + text + '</div>' +
+      nearMissDot +
+      '</div>';
+  });
+
+  // Near-miss note (shown only when answered incorrectly)
+  let nearMissNote = '';
+  if (isAnswered && ans !== q.correct_answer && nearMisses.length > 0) {
+    nearMissNote = '<div class="near-miss-note show">⚡ Near-miss alert: option(s) ' +
+      nearMisses.map(k => k.toUpperCase()).join(', ') +
+      ' share significant vocabulary with the correct answer. Study the distinction carefully.</div>';
+  }
+
+  // Explanation + distractor analysis
+  let explainHtml = '';
+  if (isAnswered && q.explanation) {
+    const isCorrect = ans === q.correct_answer;
+
+    // Adversarial trap analysis
+    const trap = getAdversarialTrap(q, ans);
+    const trapHtml = trap
+      ? '<div class="distractor-analysis"><div class="da-title">⚡ Adversarial Trap Analysis</div>' +
+        '<div class="da-row"><div class="da-key wrong">' + (ans || '').toUpperCase() + '</div>' +
+        '<div class="da-text"><strong>' + trap.trapType + '</strong><br>' + trap.trapDesc + '</div></div></div>'
+      : '';
+
+    // Distractor quality breakdown
+    const daHtml = buildDistractorAnalysis(q, ans);
+
+    explainHtml =
+      '<div class="explanation-panel">' +
+        '<div class="explanation-header">' +
+          '<span class="explanation-icon ' + (isCorrect ? 'correct' : 'incorrect') + '">' + (isCorrect ? '✓' : '✗') + '</span>' +
+          '<span class="explanation-label ' + (isCorrect ? 'correct' : 'incorrect') + '">' + (isCorrect ? 'Correct' : 'Incorrect') + '</span>' +
+        '</div>' +
+        '<div class="explanation-body">' + q.explanation + trapHtml + daHtml + '</div>' +
+      '</div>';
+  }
+
+  content.innerHTML =
+    (tagsHtml ? '<div class="q-tags">' + tagsHtml + '</div>' : '') +
+    (q.archetype ? '<div class="q-archetype-label show">Archetype: ' + q.archetype + '</div>' : '') +
+    '<div class="q-text">' + q.question + '</div>' +
+    nearMissNote +
+    '<div class="options-list">' + optionsHtml + '</div>' +
+    explainHtml;
+}
+
+// ─────────────────────────────────────────
+//  Distractor Analysis block builder
+//  Shows per-option similarity to correct
+//  answer after answering a question.
+// ─────────────────────────────────────────
+function buildDistractorAnalysis(q, selectedKey) {
+  if (!q.options || !q.correct_answer) return '';
+
+  const correctText = q.options[q.correct_answer] || '';
+  const correctWords = new Set(correctText.toLowerCase().split(/\W+/).filter(w => w.length > 3));
+
+  const rows = Object.entries(q.options).map(([key, text]) => {
+    const words = text.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+    const shared = words.filter(w => correctWords.has(w));
+    const lenDiff = Math.round(Math.abs(text.length - correctText.length) / (correctText.length || 1) * 100);
+    const isCorrect = key === q.correct_answer;
+    const isSelected = key === selectedKey;
+    const similarity = isCorrect ? '—' : (shared.length >= 3 ? 'High' : shared.length >= 1 ? 'Moderate' : 'Low');
+    const simColor = similarity === 'High' ? 'var(--yellow)' : similarity === 'Moderate' ? 'var(--text2)' : 'var(--text3)';
+
+    return '<div class="da-row">' +
+      '<div class="da-key ' + (isCorrect ? 'correct' : (isSelected ? 'wrong' : '')) + '">' + key.toUpperCase() + '</div>' +
+      '<div class="da-text">' + text.slice(0, 60) + (text.length > 60 ? '…' : '') + '</div>' +
+      (isCorrect ? '' : '<div class="da-similarity" style="color:' + simColor + '">' + similarity + '</div>') +
+    '</div>';
+  }).join('');
+
+  return '<div class="distractor-analysis">' +
+    '<div class="da-title">Distractor Analysis — Similarity to Correct Answer</div>' +
+    rows +
+  '</div>';
+}
+
+function selectAnswer(qid, key) {
+  if (state.answers[qid] !== undefined) return;
+  state.answers[qid] = key;
+  // Add to Anki deck if wrong
+  const q = state.questions.find(x => x.id == qid) || state.allQuestions.find(x => x.id == qid);
+  if (q && key !== q.correct_answer) addToAnkiDeck(q);
+  renderQuestion();
+  renderSidebar();
+  scheduleAutosave();
+}
+
+function navigate(dir) {
+  const newIdx = state.currentIdx + dir;
+  if (newIdx < 0 || newIdx >= state.questions.length) return;
+  state.currentIdx = newIdx;
+  renderQuestion();
+  renderSidebar();
+  scheduleAutosave();
+}
+
+function toggleFlag() {
+  if (!state.questions.length) return;
+  const q = state.questions[state.currentIdx];
+  if (state.flags.has(q.id)) state.flags.delete(q.id);
+  else state.flags.add(q.id);
+  renderQuestion();
+  renderSidebar();
+  scheduleAutosave();
+}
+
+function setFilter(f) {
+  state.filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === f);
+  });
+  applyFilter();
+  renderSidebar();
+  renderQuestion();
+  scheduleAutosave();
+}
+
+function resetQuiz() {
+  if (!state.quiz) return;
+  // Re-scramble on reset — fresh question and option order
+  const scrambled = scrambleQuestionOrder(
+    state.originalQuestions.map(q => scrambleOptions(q))
+  );
+  state.allQuestions = scrambled;
+  state.answers = {};
+  state.flags = new Set();
+  state.filter = 'all';
+  state.reviewMode = false;
+  state.currentIdx = 0;
+  state.questions = [...state.allQuestions];
+  setFilter('all');
+  saveProgress();
+  showView('quiz');
+  showToast('Session reset — new shuffle applied');
+}
+
+function reviewIncorrect() {
+  state.filter = 'incorrect';
+  state.reviewMode = true;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === 'incorrect');
+  });
+  applyFilter();
+  state.currentIdx = 0;
+  showView('quiz');
+}
+
+// ═══════════════════════════════════════════════════════
+//  RESULTS
+// ═══════════════════════════════════════════════════════
+function renderResults() {
+  const noMsg = document.getElementById('no-results-msg');
+  const card = document.getElementById('results-card');
+  const answered = Object.keys(state.answers).length;
+  if (!state.quiz || answered === 0) {
+    noMsg.style.display = 'flex'; card.classList.add('hidden'); return;
+  }
+  noMsg.style.display = 'none'; card.classList.remove('hidden');
+  updateAnkiCountDisplay();
+
+  const correct = state.allQuestions.filter(q => state.answers[q.id] === q.correct_answer).length;
+  const incorrect = answered - correct;
+  const pct = Math.round((correct / answered) * 100);
+
+  document.getElementById('r-pct').textContent = pct + '%';
+  document.getElementById('r-correct').textContent = correct;
+  document.getElementById('r-incorrect').textContent = incorrect;
+  document.getElementById('r-total').textContent = answered;
+
+  let grade, sub, color;
+  if (pct >= 90) { grade = 'Outstanding'; sub = 'Excellent performance — board-exam ready.'; color = 'var(--green)'; }
+  else if (pct >= 75) { grade = 'Proficient'; sub = 'Solid understanding — review flagged questions.'; color = 'var(--accent)'; }
+  else if (pct >= 60) { grade = 'Developing'; sub = 'Good foundation — study near-miss distractors.'; color = 'var(--yellow)'; }
+  else { grade = 'Needs Work'; sub = 'Focus on conceptual gaps, not just facts.'; color = 'var(--red)'; }
+
+  document.getElementById('r-grade').textContent = grade;
+  document.getElementById('r-grade').style.color = color;
+  document.getElementById('r-sub').textContent = answered + ' of ' + state.allQuestions.length + ' attempted · ' + sub;
+  document.querySelector('.score-circle').style.borderColor = color;
+
+  // Answer pattern analysis
+  renderAnswerPatternAnalysis();
+}
+
+function renderAnswerPatternAnalysis() {
+  const { distribution, warnings } = analyzeAnswerPatterns(state.allQuestions, state.answers);
+  const distEl = document.getElementById('ra-distribution');
+  const warnEl = document.getElementById('ra-warnings');
+  if (!distEl) return;
+
+  const allKeys = [...new Set(state.allQuestions.flatMap(q => Object.keys(q.options)))].sort();
+  const total = Object.values(distribution).reduce((s, v) => s + v, 0);
+  const maxCount = Math.max(...Object.values(distribution), 1);
+
+  distEl.innerHTML = allKeys.map(key => {
+    const count = distribution[key] || 0;
+    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+    const barH = Math.round((count / maxCount) * 36);
+    const isHigh = pct > 40;
+    return '<div class="ra-bar-wrap">' +
+      '<div class="ra-bar' + (isHigh ? ' high' : '') + '" style="height:' + barH + 'px" title="' + count + ' answers"></div>' +
+      '<div class="ra-bar-label">' + key.toUpperCase() + ' ' + pct + '%</div>' +
+    '</div>';
+  }).join('');
+
+  if (warnings.length > 0) {
+    warnEl.innerHTML = '<div class="ra-warnings">' + warnings.map(w => '⚠ ' + w).join('<br>') + '</div>';
+  } else {
+    warnEl.innerHTML = '<div class="ra-ok">✓ Answer distribution looks balanced — no positional bias detected.</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  const activeView = document.querySelector('.view.active');
+  if (!activeView || activeView.id !== 'view-quiz') return;
+  if (!state.questions.length) return;
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  const q = state.questions[state.currentIdx];
+  const keys = Object.keys(q.options);
+  if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); navigate(1); }
+  else if (e.key === 'f' || e.key === 'F') toggleFlag();
+  else {
+    const n = parseInt(e.key);
+    if (!isNaN(n) && n >= 1 && n <= keys.length) selectAnswer(q.id, keys[n - 1]);
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ⑨  PROMPT BUILDER — ADVANCED PSYCHOMETRIC GENERATION
+//  Completely rewritten to enforce:
+//  • Exam-grade distractor quality
+//  • Near-miss construction rules
+//  • Adversarial mode instructions
+//  • AI critic pipeline trigger
+//  • Per-archetype generation guidance
+//  • Answer distribution enforcement
+// ═══════════════════════════════════════════════════════
+function setMode(m) {
+  state.prompt.mode = m;
+  document.querySelectorAll('.mode-opt').forEach(el => el.classList.toggle('active', el.dataset.mode === m));
+  document.getElementById('topic-field').classList.toggle('hidden', m !== 'topic');
+  document.getElementById('material-field').classList.toggle('hidden', m !== 'material');
+}
+
+function setDiff(d) {
+  state.prompt.difficulty = d;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.toggle('active', b.dataset.d === d));
+}
+
+function toggleQtype(el) {
+  const qt = el.dataset.qt;
+  if (state.prompt.qtypes.has(qt)) {
+    if (state.prompt.qtypes.size === 1) return;
+    state.prompt.qtypes.delete(qt);
+  } else {
+    state.prompt.qtypes.add(qt);
+  }
+  el.classList.toggle('active', state.prompt.qtypes.has(qt));
+}
+
+function toggleSwitch(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('on');
+  if (id === 'tog-explanations')  state.prompt.explanations = el.classList.contains('on');
+  if (id === 'tog-tags')          state.prompt.tags = el.classList.contains('on');
+  if (id === 'tog-adversarial')   state.prompt.adversarial = el.classList.contains('on');
+  if (id === 'tog-nearmiss')      state.prompt.nearMiss = el.classList.contains('on');
+  if (id === 'tog-critic')        state.prompt.critic = el.classList.contains('on');
+  if (id === 'tog-da')            state.prompt.distractorAnalysis = el.classList.contains('on');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROMPT TABS
+// ═══════════════════════════════════════════════════════
+let activePromptTab = 'gen';
+
+function switchPromptTab(tab) {
+  activePromptTab = tab;
+  document.getElementById('ptab-gen').classList.toggle('active', tab === 'gen');
+  document.getElementById('ptab-critic').classList.toggle('active', tab === 'critic');
+  if (tab === 'critic') generateCriticPrompt();
+  else generatePrompt();
+}
+
+function generateCriticPrompt() {
+  const count = parseInt(document.getElementById('p-count').value);
+  const diff  = state.prompt.difficulty;
+  const opts  = parseInt(document.getElementById('p-opts').value);
+
+  const prompt =
+`<< TESTIT CRITIC — DISTRACTOR QUALITY REVIEW >>
+
+You are an expert psychometric reviewer. You will receive a JSON quiz and your ONLY job is to improve distractor quality.
+
+You must NOT:
+- Randomize answer positions
+- Change correct answers
+- Rebalance option letter distribution
+- Add or remove questions
+- Change question count
+
+You MUST:
+1. Review every distractor (wrong option) in every question.
+2. Flag any distractor that is:
+   - Obviously wrong (trivially incorrect, absurd, or unrelated)
+   - A giveaway (too short, too long, or structurally different from correct answer)
+   - A duplicate concept restated differently
+3. For each flagged distractor:
+   - Rewrite it as a near-miss: plausible to a partially-prepared learner
+   - Ensure it shares conceptual vocabulary with the correct answer
+   - Ensure it differs from the correct answer in ONE critical dimension only
+4. Ensure ALL options per question are similar in:
+   - Length (within 30% of each other)
+   - Specificity level
+   - Grammatical structure
+5. Check: is the correct answer identifiable WITHOUT domain knowledge?
+   If yes, rewrite all distractors to be more competitive.
+
+DIFFICULTY TARGET: ${diff.charAt(0).toUpperCase()+diff.slice(1)}
+OPTIONS PER QUESTION: ${opts}
+
+WHAT TO OUTPUT:
+Return the COMPLETE quiz JSON with your improvements applied.
+Only modify "options" fields where distractors were weak.
+Keep correct_answer, explanation, tags, difficulty, archetype unchanged.
+At the START of the JSON output, add a top-level field:
+  "critic_report": "X distractors revised across Y questions."
+
+OUTPUT FORMAT: strict JSON only. No markdown. No preamble.
+
+PASTE THE QUIZ JSON BELOW THIS LINE:
+[paste your quiz JSON here]`;
+
+  document.getElementById('prompt-output').textContent = prompt;
+}
+
+function generatePrompt() {
+  const count        = parseInt(document.getElementById('p-count').value);
+  const opts         = parseInt(document.getElementById('p-opts').value);
+  const topic        = document.getElementById('p-topic').value.trim();
+  const material     = document.getElementById('p-material').value.trim();
+  const extra        = document.getElementById('p-extra').value.trim();
+  const diff         = state.prompt.difficulty;
+  const mode         = state.prompt.mode;
+  const qtypes       = [...state.prompt.qtypes];
+  const profile      = DIFFICULTY_PROFILES[diff];
+
+  const explRequired = state.prompt.explanations;
+  const tagsOn       = state.prompt.tags;
+  const adversarial  = state.prompt.adversarial;
+  const nearMiss     = state.prompt.nearMiss;
+
+  let contentBlock = '';
+  if (mode === 'topic') {
+    contentBlock = topic
+      ? 'Topic: ' + topic
+      : '[TOPIC NOT SET — paste your topic here]';
+  } else {
+    contentBlock = material
+      ? 'MATERIAL:\n\n' + material
+      : '[NO MATERIAL PROVIDED]';
+  }
+
+  // Build archetype distribution instruction
+  const archetypeList = qtypes.map(qt => {
+    const a = ARCHETYPES[qt];
+    return `  • ${qt}${a ? ': ' + a.desc : ''}`;
+  }).join('\n');
+
+  // Build per-archetype guidance
+  const archetypeGuidance = qtypes.map(qt => {
+    const guides = {
+      'Standard': 'Direct factual/conceptual question. Single unambiguously best answer.',
+      'Best Next Step': 'Present a scenario mid-action. Ask for the MOST appropriate immediate next step. Include a distractor that is a reasonable step but not NEXT.',
+      'Comparative Analysis': 'Compare two related concepts on a specific dimension. Distractors must mix up properties of each.',
+      'Mechanism Identification': 'Present an observable outcome. Ask for the specific mechanism responsible. Distractors must be real mechanisms that are plausible for similar conditions.',
+      'Assertion-Reason': 'Present an assertion (A) and a reason (R). Options: (a) A true, R true, R explains A. (b) A true, R true, R does NOT explain A. (c) A true, R false. (d) A false. Correct answer must require understanding both.',
+      'Clinical Vignette': 'Present a 3–6 sentence clinical or applied scenario with key data points. Question must require integrating ≥2 data points. Avoid obvious single-variable questions.',
+      'Multi-step Reasoning': 'Require the examinee to perform ≥2 logical steps before arriving at the answer. Distractors represent errors at different steps.',
+      'Error Finding': 'Present 4 statements, ask which is INCORRECT. The incorrect one must be a common misconception, not a trivially wrong statement.',
+      'Negation': 'Use EXCEPT/NOT/LEAST. The exception must require careful reasoning, not just a reversal of an obvious fact.',
+      'Scenario-Based': 'Real-world applied scenario requiring professional judgment. Avoid textbook-style phrasing.',
+      'Chronological': 'Sequence 3–5 events/stages. Distractors must transpose plausibly confusable steps.',
+      'Conceptual Discrimination': 'Two closely related concepts. Distractors must exploit the most common confusion between them.',
+    };
+    return qt + ': ' + (guides[qt] || 'Follow standard MCQ best practices.');
+  }).join('\n');
+
+  // Build distractor quality rules
+  const distractorRules = nearMiss
+    ? `NEAR-MISS DISTRACTOR REQUIREMENTS (mandatory):
+  • At least ${diff === 'hard' ? '3' : diff === 'medium' ? '2' : '1'} option(s) per question must be "near-misses" — plausible to a partially prepared learner.
+  • Near-misses must share conceptual vocabulary with the correct answer but differ in one critical dimension.
+  • Distractors must represent real misconceptions, partial truths, or confusable alternatives — NOT trivially wrong answers.
+  • All options must be similar in length (within 40% of each other).
+  • All options must be similar in specificity, technicality, and grammatical structure.
+  • Never use "All of the above", "None of the above", or "Both A and C" as options.`
+    : `DISTRACTOR REQUIREMENTS:
+  • Distractors must be plausible alternatives — not obviously wrong.
+  • Maintain consistent option length, structure, and specificity.`;
+
+  // Adversarial mode instructions
+  const adversarialSection = adversarial
+    ? `
+ADVERSARIAL EXAM MODE (active):
+  • Design questions to specifically trap partially-prepared learners who rely on surface memorization.
+  • Include at least one "trap distractor" per question: an option that sounds authoritative but contains a subtle factual error.
+  • Use technical jargon in distractors at the same density as in the correct answer.
+  • The correct answer must NOT be longer than distractors — if anything, make distractors slightly more verbose.
+  • Test conceptual edges, exceptions, and nuanced distinctions — not central definitions.
+  • A student who has only memorized key terms should fail. A student who understands mechanisms should succeed.`
+    : '';
+
+  // AI Critic pipeline instruction - removed (use separate Critic Prompt tab)
+
+  const tagsPolicy = tagsOn
+    ? 'Include a "tags" field: 2–4 short, specific strings (concept, domain, subtopic). Be precise.'
+    : 'Omit tags entirely.';
+
+  const explPolicy = explRequired
+    ? `Include an "explanation" field for every question:
+  • Explain WHY the correct answer is correct (mechanism, not just restatement).
+  • Explain why each wrong answer is incorrect (brief, 1 sentence each).
+  • Keep explanations educational, not just confirmatory.`
+    : '"explanation" field: optional — include if it adds educational value.';
+
+  const diffLabel = diff.charAt(0).toUpperCase() + diff.slice(1);
+
+  const prompt =
+`<< TESTIT PROFESSIONAL EXAM GENERATOR — READ ALL INSTRUCTIONS BEFORE GENERATING >>
+
+You are an expert psychometric exam designer with experience creating board-level medical, legal, and professional certification examinations (analogous to USMLE, NCLEX, BAR, CPA).
+
+Your task: Generate ${count} high-quality MCQs matching the specifications below.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EXAM SPECIFICATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Difficulty: ${diffLabel}
+Options per question: ${opts} (adaptable for True/False or Assertion-Reason types)
+Question archetypes to use (distribute across the set):
+${archetypeList}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIFFICULTY PROFILE: ${diffLabel.toUpperCase()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Nuance Level: ${profile.nuanceLevel}/3
+Distractor Similarity: ${profile.distractorSimilarity}
+Ambiguity Level: ${profile.ambiguity}
+Scenario Complexity: ${profile.scenarioComplexity}
+Near-Miss Intensity: ${profile.nearMissIntensity}
+Generation Instruction: ${profile.promptInstructions}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARCHETYPE-SPECIFIC GUIDANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${archetypeGuidance}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${distractorRules}
+${adversarialSection}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EXPLANATION POLICY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${explPolicy}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TAGS POLICY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${tagsPolicy}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADDITIONAL INSTRUCTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${extra || 'None.'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUALITY CHECKLIST (verify each question):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Before finalizing, confirm for each question:
+  ☐ Options are grammatically parallel and similar in length
+  ☐ Correct answer requires domain knowledge (not guessable)
+  ☐ No clues embedded in the stem that point to the correct answer
+  ☐ No "all of the above" or "none of the above" options
+  ☐ Near-miss distractors represent real conceptual confusions
+  ☐ Explanation justifies all options, not just the correct one
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTPUT FORMAT (strict JSON — no other text):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{
+  "title": "Descriptive Quiz Title",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Question text here",
+      "options": {"a": "...", "b": "...", "c": "...", "d": "..."},
+      "correct_answer": "a",
+      "explanation": "...",
+      "tags": ["tag1", "tag2"],
+      "difficulty": "${diff}",
+      "archetype": "Standard"
+    }
+  ]
+}
+
+Include "difficulty" and "archetype" fields on every question.
+Strictly double-escape all backslashes in LaTeX (\\\\frac not \\frac).
+Do NOT include any text outside the JSON object.
+Do NOT include markdown code fences.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTENT SOURCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${mode === 'topic' ? contentBlock : contentBlock}`;
+
+  document.getElementById('prompt-output').textContent = prompt;
+}
+
+function copyPrompt() {
+  const output = document.getElementById('prompt-output').textContent;
+  if (output.includes('Configure options') || output.includes('←')) return;
+  navigator.clipboard.writeText(output).then(() => {
+    const fb = document.getElementById('copy-feedback');
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2000);
+    showToast('Prompt copied to clipboard');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  THEME (light / dark)
+// ═══════════════════════════════════════════════════════
+const LS_THEME   = 'testit_theme';
+const LS_PRESETS = 'testit_prompt_presets';
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem(LS_THEME, next);
+  // Update settings toggle switch if visible
+  const sw = document.getElementById('theme-toggle-switch');
+  if (sw) sw.classList.toggle('on', next === 'dark');
+}
+
+function applyStoredTheme() {
+  const saved = localStorage.getItem(LS_THEME) || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  // Sync the settings switch if it exists yet
+  const sw = document.getElementById('theme-toggle-switch');
+  if (sw) sw.classList.toggle('on', saved === 'dark');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROMPT CONFIG PANEL (mobile drawer)
+// ═══════════════════════════════════════════════════════
+function openPromptConfig() {
+  document.getElementById('prompt-config-panel').classList.add('open');
+  document.getElementById('prompt-config-overlay').classList.add('show');
+}
+function closePromptConfig() {
+  const p = document.getElementById('prompt-config-panel');
+  const o = document.getElementById('prompt-config-overlay');
+  if (p) p.classList.remove('open');
+  if (o) o.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PRESET SAVE / LOAD
+//  Captures full prompt-builder state into a named slot
+//  persisted in localStorage.
+// ═══════════════════════════════════════════════════════
+function getPresets() {
+  try { return JSON.parse(localStorage.getItem(LS_PRESETS)) || []; } catch(e) { return []; }
+}
+function savePresets(arr) {
+  try { localStorage.setItem(LS_PRESETS, JSON.stringify(arr)); } catch(e) {}
+}
+
+function capturePromptState() {
+  return {
+    mode:       state.prompt.mode,
+    difficulty: state.prompt.difficulty,
+    count:      parseInt(document.getElementById('p-count').value),
+    opts:       parseInt(document.getElementById('p-opts').value),
+    topic:      document.getElementById('p-topic').value.trim(),
+    extra:      document.getElementById('p-extra').value.trim(),
+    qtypes:     [...state.prompt.qtypes],
+    explanations:      state.prompt.explanations,
+    tags:              state.prompt.tags,
+    adversarial:       state.prompt.adversarial,
+    nearMiss:          state.prompt.nearMiss,
+    critic:            state.prompt.critic,
+    distractorAnalysis:state.prompt.distractorAnalysis,
+  };
+}
+
+function applyPromptState(s) {
+  // mode
+  setMode(s.mode || 'topic');
+  // difficulty
+  setDiff(s.difficulty || 'easy');
+  // count
+  const countEl = document.getElementById('p-count');
+  const countVal = document.getElementById('p-count-val');
+  if (countEl) { countEl.value = s.count || 10; countVal.textContent = s.count || 10; }
+  // opts
+  const optsEl = document.getElementById('p-opts');
+  const optsVal = document.getElementById('p-opts-val');
+  if (optsEl) { optsEl.value = s.opts || 4; optsVal.textContent = s.opts || 4; }
+  // topic
+  const topicEl = document.getElementById('p-topic');
+  if (topicEl && s.topic) topicEl.value = s.topic;
+  // extra
+  const extraEl = document.getElementById('p-extra');
+  if (extraEl && s.extra) extraEl.value = s.extra;
+  // qtypes
+  if (s.qtypes) {
+    state.prompt.qtypes = new Set(s.qtypes);
+    document.querySelectorAll('.qtype-opt').forEach(el => {
+      el.classList.toggle('active', state.prompt.qtypes.has(el.dataset.qt));
+    });
+  }
+  // toggles
+  const toggleMap = {
+    'tog-explanations': 'explanations',
+    'tog-tags': 'tags',
+    'tog-adversarial': 'adversarial',
+    'tog-nearmiss': 'nearMiss',
+    'tog-critic': 'critic',
+    'tog-da': 'distractorAnalysis',
+  };
+  Object.entries(toggleMap).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = s[key] !== undefined ? s[key] : state.prompt[key];
+    el.classList.toggle('on', !!val);
+    state.prompt[key] = !!val;
+  });
+}
+
+function savePreset() {
+  showPresetNameModal(function(name) {
+    if (!name || !name.trim()) return;
+    const presets = getPresets();
+    const existingIdx = presets.findIndex(p => p.name === name.trim());
+    const entry = { name: name.trim(), state: capturePromptState(), savedAt: Date.now() };
+    if (existingIdx >= 0) {
+      presets[existingIdx] = entry;
+      showToast('Preset "' + name.trim() + '" updated');
+    } else {
+      presets.push(entry);
+      showToast('Preset "' + name.trim() + '" saved');
+    }
+    savePresets(presets);
+    renderPresets();
+  });
+}
+
+function showPresetNameModal(callback) {
+  // Remove any existing modal
+  const existing = document.getElementById('preset-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'preset-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);padding:20px';
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--radius2);padding:24px;width:100%;max-width:320px;box-shadow:var(--shadow)';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px';
+  title.textContent = 'Save Preset';
+
+  const input = document.createElement('input');
+  input.id = 'preset-name-input';
+  input.type = 'text';
+  input.placeholder = 'Preset name...';
+  input.style.cssText = 'width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 12px;outline:none;box-sizing:border-box;margin-bottom:14px;display:block';
+
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText = 'flex:1;padding:10px;background:transparent;border:1.5px solid var(--border2);border-radius:var(--radius);color:var(--text2);font-family:var(--mono);font-size:11px;cursor:pointer;text-transform:uppercase';
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.textContent = 'Save';
+  confirmBtn.style.cssText = 'flex:1;padding:10px;background:var(--accent2);border:none;border-radius:var(--radius);color:#fff;font-family:var(--mono);font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:600';
+
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(confirmBtn);
+  box.appendChild(title);
+  box.appendChild(input);
+  box.appendChild(btnRow);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+
+  setTimeout(() => input.focus(), 50);
+
+  const submit = () => {
+    const val = input.value.trim();
+    modal.remove();
+    callback(val);
+  };
+  cancelBtn.addEventListener('click', () => modal.remove());
+  confirmBtn.addEventListener('click', submit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submit();
+    if (e.key === 'Escape') modal.remove();
+  });
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+function loadPreset(name) {
+  const presets = getPresets();
+  const p = presets.find(x => x.name === name);
+  if (!p) return;
+  applyPromptState(p.state);
+  showToast('Preset "' + name + '" loaded');
+  closePromptConfig();
+}
+
+function deletePreset(name) {
+  const presets = getPresets().filter(p => p.name !== name);
+  savePresets(presets);
+  renderPresets();
+  showToast('Preset deleted');
+}
+
+function renderPresets() {
+  const container = document.getElementById('preset-chips');
+  if (!container) return;
+  const presets = getPresets();
+  container.innerHTML = '';
+  if (!presets.length) {
+    const empty = document.createElement('span');
+    empty.style.cssText = 'font-size:10px;font-family:var(--mono);color:var(--text3);font-style:italic';
+    empty.textContent = 'none saved';
+    container.appendChild(empty);
+    return;
+  }
+  presets.forEach(function(p) {
+    const chip = document.createElement('div');
+    chip.className = 'preset-chip';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = p.name;
+    nameSpan.addEventListener('click', function() { loadPreset(p.name); });
+
+    const delSpan = document.createElement('span');
+    delSpan.className = 'del-preset';
+    delSpan.textContent = '✕';
+    delSpan.title = 'Delete';
+    delSpan.addEventListener('click', function(e) {
+      e.stopPropagation();
+      deletePreset(p.name);
+    });
+
+    chip.appendChild(nameSpan);
+    chip.appendChild(delSpan);
+    container.appendChild(chip);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT  (core app — runs before sync modules are defined)
+// ═══════════════════════════════════════════════════════
+(function init() {
+  applyStoredTheme();
+  renderLibrary();
+  renderPresets();
+  updateAnkiCountDisplay();
+  window.addEventListener('resize', () => {
+    const hasQuiz = !!(state.quiz && state.allQuestions.length);
+    updateMobileToggleVisibility(hasQuiz);
+    if (window.innerWidth > 700) {
+      closeMobileSidebar();
+      closePromptConfig();
+    }
+  });
+})();
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  TESTIT SYNC SYSTEM                                          ║
+// ║  Offline-first · Google Drive AppData · IndexedDB            ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+// ─────────────────────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────────────────────
+const SYNC_CONFIG = {
+  DB_NAME:        'testit_db',
+  DB_VERSION:     1,
+  BACKUP_VERSION: 1,
+  GDRIVE_FILE:    'testit_backup.json',
+  GDRIVE_SCOPE:   'https://www.googleapis.com/auth/drive.appdata',
+
+  // Google OAuth Web Application Client ID
+  // In Google Console, add Authorised redirect URI:
+  //   https://YOUR-USERNAME.github.io/testit/auth.html
+  // and Authorised JavaScript origin:
+  //   https://YOUR-USERNAME.github.io
+  GOOGLE_CLIENT_ID: '___REPLACE_WITH_YOUR_GOOGLE_CLIENT_ID___',
+
+  SYNC_DEBOUNCE_MS: 3000,
+  LS_LAST_SYNC:   'testit_last_sync',
+  LS_PREV_BACKUP: 'testit_prev_backup',
+  LS_GTOKEN:      'testit_gtoken',
+  LS_OAUTH_STATE: 'testit_oauth_state',
+};
+
+// ─────────────────────────────────────────────────────────────
+// ① LOCAL DATABASE MANAGER  (IndexedDB wrapper)
+// ─────────────────────────────────────────────────────────────
+const dbManager = (function() {
+  let _db = null;
+
+  function open() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise(function(resolve, reject) {
+      const req = indexedDB.open(SYNC_CONFIG.DB_NAME, SYNC_CONFIG.DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('kv')) {
+          db.createObjectStore('kv');
+        }
+      };
+      req.onsuccess = function(e) { _db = e.target.result; resolve(_db); };
+      req.onerror   = function(e) { reject(e.target.error); };
+    });
+  }
+
+  function get(key) {
+    return open().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        const tx  = db.transaction('kv', 'readonly');
+        const req = tx.objectStore('kv').get(key);
+        req.onsuccess = function() { resolve(req.result); };
+        req.onerror   = function() { reject(req.error); };
+      });
+    });
+  }
+
+  function set(key, value) {
+    return open().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        const tx  = db.transaction('kv', 'readwrite');
+        const req = tx.objectStore('kv').put(value, key);
+        req.onsuccess = function() { resolve(); };
+        req.onerror   = function() { reject(req.error); };
+      });
+    });
+  }
+
+  function remove(key) {
+    return open().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        const tx  = db.transaction('kv', 'readwrite');
+        const req = tx.objectStore('kv').delete(key);
+        req.onsuccess = function() { resolve(); };
+        req.onerror   = function() { reject(req.error); };
+      });
+    });
+  }
+
+  function getAllKeys() {
+    return open().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        const tx  = db.transaction('kv', 'readonly');
+        const req = tx.objectStore('kv').getAllKeys();
+        req.onsuccess = function() { resolve(req.result); };
+        req.onerror   = function() { reject(req.error); };
+      });
+    });
+  }
+
+  function clearAll() {
+    return open().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        const tx  = db.transaction('kv', 'readwrite');
+        const req = tx.objectStore('kv').clear();
+        req.onsuccess = function() { resolve(); };
+        req.onerror   = function() { reject(req.error); };
+      });
+    });
+  }
+
+  // Migrate existing localStorage quiz data to IndexedDB
+  function migrateFromLocalStorage() {
+    const promises = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      try {
+        const val = localStorage.getItem(key);
+        promises.push(set('ls:' + key, val));
+      } catch(e) {}
+    }
+    return Promise.all(promises);
+  }
+
+  return { get, set, remove, getAllKeys, clearAll, migrateFromLocalStorage };
+})();
+
+// ─────────────────────────────────────────────────────────────
+// ② BACKUP MANAGER  (serialize / deserialize all app data)
+// ─────────────────────────────────────────────────────────────
+const backupManager = (function() {
+
+  // Collect all app data into the standard backup schema
+  // Track when local data actually changed — persisted so it survives page loads.
+  // Only updated when quiz data, settings, or custom data is written.
+  function touchLocalModified() {
+    try { localStorage.setItem('testit_data_modified', String(Date.now())); } catch(e) {}
+  }
+
+  function getLocalModified() {
+    return parseInt(localStorage.getItem('testit_data_modified') || '0', 10);
+  }
+
+  function buildBackup() {
+    const studyProgress = {};
+    const customData    = {};
+
+    // Collect all localStorage quiz slots
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      try {
+        if (key.startsWith('testit_quiz_')) {
+          studyProgress[key] = JSON.parse(localStorage.getItem(key));
+        } else if (key.startsWith('testit_prompt_presets')) {
+          customData[key] = JSON.parse(localStorage.getItem(key));
+        } else if (key === 'testit_anki_deck') {
+          customData[key] = JSON.parse(localStorage.getItem(key));
+        }
+      } catch(e) {}
+    }
+
+    const settings = {
+      theme: localStorage.getItem('testit_theme') || 'dark',
+    };
+
+    return {
+      version:      SYNC_CONFIG.BACKUP_VERSION,
+      // Use the persisted modification time, NOT Date.now().
+      // Date.now() here would always make the local backup look newest,
+      // preventing remote data from ever winning conflict resolution.
+      lastModified: getLocalModified(),
+      studyProgress,
+      statistics:   {},
+      bookmarks:    {},
+      settings,
+      customData,
+    };
+  }
+
+  // Restore backup object into app storage
+  function applyBackup(backup) {
+    if (!backup || !backup.version) throw new Error('Invalid backup format');
+
+    // Save previous backup before overwriting
+    const current = buildBackup();
+    try {
+      localStorage.setItem(SYNC_CONFIG.LS_PREV_BACKUP, JSON.stringify(current));
+    } catch(e) {}
+
+    // Apply study progress
+    if (backup.studyProgress) {
+      Object.entries(backup.studyProgress).forEach(function(kv) {
+        try { localStorage.setItem(kv[0], JSON.stringify(kv[1])); } catch(e) {}
+      });
+    }
+
+    // Apply settings
+    if (backup.settings) {
+      if (backup.settings.theme) {
+        localStorage.setItem('testit_theme', backup.settings.theme);
+        applyStoredTheme();
+      }
+    }
+
+    // Apply custom data (presets, anki)
+    if (backup.customData) {
+      Object.entries(backup.customData).forEach(function(kv) {
+        try { localStorage.setItem(kv[0], JSON.stringify(kv[1])); } catch(e) {}
+      });
+    }
+
+    // After applying remote data, set our local modification time to match
+    // what we just applied. This prevents the next sync from immediately
+    // re-uploading stale local data and overwriting the remote again.
+    try {
+      if (backup.lastModified) {
+        localStorage.setItem('testit_data_modified', String(backup.lastModified));
+      }
+    } catch(e) {}
+
+    renderLibrary();
+    renderPresets();
+    updateAnkiCountDisplay();
+    settingsView.updatePrevBackupInfo();
+  }
+
+  // Simple LZ-string-style compression using btoa (lightweight, no deps)
+  function compress(str) {
+    try { return btoa(unescape(encodeURIComponent(str))); } catch(e) { return str; }
+  }
+
+  function decompress(str) {
+    try { return decodeURIComponent(escape(atob(str))); } catch(e) { return str; }
+  }
+
+  function exportBackup() {
+    const backup = buildBackup();
+    const json   = JSON.stringify(backup, null, 2);
+    const blob   = new Blob([json], { type: 'application/json' });
+    const url    = URL.createObjectURL(blob);
+    const a      = document.createElement('a');
+    const dt     = new Date().toISOString().slice(0,10);
+    a.href       = url;
+    a.download   = 'testit_backup_' + dt + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Backup exported');
+  }
+
+  function importBackup(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const backup = JSON.parse(e.target.result);
+        applyBackup(backup);
+        showToast('Backup imported successfully');
+      } catch(err) {
+        showToast('Import failed: invalid backup file');
+      }
+    };
+    reader.readAsText(file);
+    // Reset input
+    event.target.value = '';
+  }
+
+  function restorePreviousBackup() {
+    const raw = localStorage.getItem(SYNC_CONFIG.LS_PREV_BACKUP);
+    if (!raw) { showToast('No previous backup available'); return; }
+    try {
+      const backup = JSON.parse(raw);
+      applyBackup(backup);
+      showToast('Previous backup restored');
+    } catch(e) {
+      showToast('Restore failed');
+    }
+  }
+
+  return { buildBackup, applyBackup, compress, decompress, exportBackup, importBackup, restorePreviousBackup };
+})();
+
+// ─────────────────────────────────────────────────────────────
+// ③ GOOGLE AUTH MANAGER — PWA Edition
+//
+// ┌─────────────────────────────────────────────────────────┐
+// │  FLOW: Google Identity Services (GSI) token client      │
+// │                                                         │
+// │  This is the correct approach for a no-backend web app: │
+// │  GSI opens Google's consent popup, returns an           │
+// │  access_token directly — no code exchange, no           │
+// │  client_secret, no redirect URI required.               │
+// │                                                         │
+// │  Works in: Chrome/Android PWA, Samsung Internet,        │
+// │  Firefox, Edge, Safari, desktop installed PWA.          │
+// │                                                         │
+// │  Google Console setup:                                  │
+// │   • Application type: Web application                   │
+// │   • Authorised JavaScript origins: your GitHub Pages    │
+// │     or Netlify URL (no path, no trailing slash)         │
+// │   • NO redirect URI needed for this flow                │
+// └─────────────────────────────────────────────────────────┘
+// ─────────────────────────────────────────────────────────────
+const googleAuth = (function() {
+  let _tokenClient  = null;
+  let _accessToken  = null;
+  let _tokenExpiry  = 0;
+
+  // ── Token storage ─────────────────────────────────────────
+  function _storeToken(token, expiresIn, email, name) {
+    _accessToken = token;
+    _tokenExpiry  = Date.now() + ((expiresIn || 3600) - 60) * 1000;
+    try {
+      localStorage.setItem(SYNC_CONFIG.LS_GTOKEN, JSON.stringify({
+        token, expiry: _tokenExpiry, email: email || '', name: name || '',
+      }));
+    } catch(e) {}
+    settingsView.updateAuthUI(true, email || '', name || '');
+  }
+
+  function _clearToken() {
+    _accessToken = null;
+    _tokenExpiry  = 0;
+    try { localStorage.removeItem(SYNC_CONFIG.LS_GTOKEN); } catch(e) {}
+    settingsView.updateAuthUI(false, '', '');
+  }
+
+  // ── Load GSI library on demand ────────────────────────────
+  function _loadGSI() {
+    return new Promise(function(resolve, reject) {
+      if (typeof google !== 'undefined' && google.accounts) { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload  = resolve;
+      s.onerror = function() {
+        reject(new Error('Could not load Google Sign-In. Check your internet connection.'));
+      };
+      document.head.appendChild(s);
+    });
+  }
+
+  // ── User info ─────────────────────────────────────────────
+  function fetchUserInfo() {
+    if (!_accessToken) return Promise.resolve({});
+    return fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + _accessToken }
+    }).then(function(r) { return r.json(); }).then(function(info) {
+      const email = info.email || '';
+      const name  = info.name || info.given_name || 'Google User';
+      try {
+        const raw = JSON.parse(localStorage.getItem(SYNC_CONFIG.LS_GTOKEN) || '{}');
+        raw.email = email; raw.name = name;
+        localStorage.setItem(SYNC_CONFIG.LS_GTOKEN, JSON.stringify(raw));
+      } catch(e) {}
+      settingsView.updateAuthUI(true, email, name);
+      return { email, name };
+    }).catch(function() { return {}; });
+  }
+
+  // ── Main sign-in (GSI implicit / token flow) ──────────────
+  // No redirect URI. No client_secret. No code exchange.
+  // Google opens its own consent popup, calls our callback
+  // with a fresh access_token.
+  function signIn() {
+    if (!isConfigured()) {
+      showToast('Configure GOOGLE_CLIENT_ID first');
+      return Promise.reject(new Error('Not configured'));
+    }
+
+    return _loadGSI().then(function() {
+      return new Promise(function(resolve, reject) {
+        _tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: SYNC_CONFIG.GOOGLE_CLIENT_ID,
+          scope:     SYNC_CONFIG.GDRIVE_SCOPE + ' https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+          callback:  function(resp) {
+            if (resp.error) {
+              reject(new Error(resp.error_description || resp.error));
+              showToast('Sign-in failed: ' + (resp.error_description || resp.error));
+              return;
+            }
+            _storeToken(resp.access_token, resp.expires_in);
+            fetchUserInfo().then(resolve).catch(function() { resolve({}); });
+          },
+          error_callback: function(err) {
+            // User closed the popup — not an error worth toasting
+            if (err.type === 'popup_closed') {
+              reject(new Error('Popup closed'));
+            } else {
+              reject(new Error(err.type || 'Sign-in error'));
+              showToast('Sign-in error: ' + (err.type || 'unknown'));
+            }
+          },
+        });
+        // prompt:'consent' ensures the consent screen always shows,
+        // which is required when requesting Drive scope for the first time.
+        _tokenClient.requestAccessToken({ prompt: 'consent' });
+      });
+    });
+  }
+
+  // ── Silent restore from localStorage ──────────────────────
+  function signInSilent() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(SYNC_CONFIG.LS_GTOKEN));
+      if (stored && stored.expiry > Date.now() + 60000) {
+        _accessToken = stored.token;
+        _tokenExpiry  = stored.expiry;
+        settingsView.updateAuthUI(true, stored.email || '', stored.name || '');
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  // ── Silent token refresh (no consent prompt) ──────────────
+  // Called automatically when an existing token is near expiry.
+  // If the user has already granted consent, this is seamless.
+  function refreshToken() {
+    if (!isConfigured()) return Promise.resolve(false);
+    return _loadGSI().then(function() {
+      return new Promise(function(resolve) {
+        if (!_tokenClient) {
+          _tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: SYNC_CONFIG.GOOGLE_CLIENT_ID,
+            scope:     SYNC_CONFIG.GDRIVE_SCOPE,
+            callback:  function(resp) {
+              if (resp.error) { resolve(false); return; }
+              _storeToken(resp.access_token, resp.expires_in);
+              resolve(true);
+            },
+          });
+        }
+        _tokenClient.requestAccessToken({ prompt: '' });
+      });
+    }).catch(function() { return false; });
+  }
+
+  function signOut() {
+    if (typeof google !== 'undefined' && google.accounts && _accessToken) {
+      google.accounts.oauth2.revoke(_accessToken, function() {});
+    }
+    _clearToken();
+    showToast('Signed out');
+  }
+
+  function isSignedIn() {
+    return !!_accessToken && Date.now() < _tokenExpiry;
+  }
+
+  function getToken() { return _accessToken; }
+
+  function isConfigured() {
+    return SYNC_CONFIG.GOOGLE_CLIENT_ID !== '___REPLACE_WITH_YOUR_GOOGLE_CLIENT_ID___';
+  }
+
+  function isAndroidWebView() { return false; }
+
+  return { signIn, signOut, signInSilent, refreshToken, isSignedIn, getToken, isConfigured, isAndroidWebView, fetchUserInfo };
+})();
+
+// Helper: get current active view name
+function getCurrentView() {
+  const active = document.querySelector('.view.active');
+  return active ? active.id.replace('view-', '') : 'home';
+}
+
+// ④ CONFLICT RESOLVER
+// ─────────────────────────────────────────────────────────────
+const conflictResolver = (function() {
+
+  // Merge strategy: union of all quiz slots from both sides,
+  // with per-slot newest-wins for progress on shared quizzes.
+  // Then pick the newer side's settings/customData.
+  // This means creating a quiz on Device A and studying on Device B
+  // never results in data loss — both quizzes survive.
+  function resolve(local, remote) {
+    if (!remote) return { winner: local, source: 'local' };
+    if (!local)  return { winner: remote, source: 'remote' };
+
+    const lm = local.lastModified  || 0;
+    const rm = remote.lastModified || 0;
+
+    // Merge studyProgress: union of all quiz keys, newest progress wins per key
+    const mergedProgress = {};
+    const allKeys = new Set([
+      ...Object.keys(local.studyProgress  || {}),
+      ...Object.keys(remote.studyProgress || {}),
+    ]);
+    allKeys.forEach(function(key) {
+      const lSlot = (local.studyProgress  || {})[key];
+      const rSlot = (remote.studyProgress || {})[key];
+      if (!lSlot) { mergedProgress[key] = rSlot; return; }
+      if (!rSlot) { mergedProgress[key] = lSlot; return; }
+      // Both have it — keep whichever was saved more recently
+      const lSaved = lSlot.savedAt || 0;
+      const rSaved = rSlot.savedAt || 0;
+      mergedProgress[key] = lSaved >= rSaved ? lSlot : rSlot;
+    });
+
+    // For settings and customData, use the newer side
+    const newer  = lm >= rm ? local  : remote;
+    const source = lm >= rm ? 'local' : 'remote';
+
+    const winner = {
+      version:       local.version || remote.version,
+      lastModified:  Math.max(lm, rm),
+      studyProgress: mergedProgress,
+      statistics:    newer.statistics  || {},
+      bookmarks:     newer.bookmarks   || {},
+      settings:      newer.settings    || {},
+      customData:    newer.customData  || {},
+    };
+
+    // If the merged result differs from both sides, treat as 'merged'
+    return { winner, source };
+  }
+
+  return { resolve };
+})();
+
+// ─────────────────────────────────────────────────────────────
+// ⑤ SYNC MANAGER  (Google Drive AppData)
+// ─────────────────────────────────────────────────────────────
+const syncManager = (function() {
+  let _fileId   = null;
+  let _syncing  = false;
+  let _debTimer = null;
+
+  function setStatus(status) {
+    const dot = document.getElementById('sync-status-dot');
+    const badge = document.getElementById('nav-sync-badge');
+    if (dot) { dot.className = 'sync-status-dot ' + status; }
+    if (badge) {
+      badge.className = 'nav-sync-badge show ' + (status === 'synced' ? '' : status);
+      if (status === 'synced') setTimeout(function() { badge.classList.remove('show'); }, 4000);
+    }
+  }
+
+  function setProgress(pct) {
+    const bar  = document.getElementById('sync-progress-bar');
+    const fill = document.getElementById('sync-progress-fill');
+    if (!bar || !fill) return;
+    if (pct <= 0) { bar.classList.add('hidden'); return; }
+    bar.classList.remove('hidden');
+    fill.style.width = Math.min(100, pct) + '%';
+    if (pct >= 100) setTimeout(function() { bar.classList.add('hidden'); fill.style.width = '0%'; }, 800);
+  }
+
+  function updateLastSyncUI() {
+    const el = document.getElementById('sync-last-time');
+    if (!el) return;
+    const ts = localStorage.getItem(SYNC_CONFIG.LS_LAST_SYNC);
+    if (!ts) { el.textContent = 'Never'; return; }
+    const d = new Date(parseInt(ts));
+    el.textContent = d.toLocaleString();
+  }
+
+  // List AppData files and find our backup file
+  function findBackupFile() {
+    return fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name,modifiedTime)', {
+      headers: { 'Authorization': 'Bearer ' + googleAuth.getToken() }
+    }).then(function(r) {
+      if (!r.ok) throw new Error('Drive list failed: ' + r.status);
+      return r.json();
+    }).then(function(data) {
+      const files = (data.files || []).filter(function(f) { return f.name === SYNC_CONFIG.GDRIVE_FILE; });
+      return files.length > 0 ? files[0].id : null;
+    });
+  }
+
+  // Download remote backup
+  function downloadBackup(fileId) {
+    return fetch('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media', {
+      headers: { 'Authorization': 'Bearer ' + googleAuth.getToken() }
+    }).then(function(r) {
+      if (!r.ok) throw new Error('Drive download failed: ' + r.status);
+      return r.text();
+    }).then(function(text) {
+      // Try base64 decompress first, fall back to plain JSON
+      try {
+        const decompressed = backupManager.decompress(text);
+        return JSON.parse(decompressed);
+      } catch(e) {
+        return JSON.parse(text);
+      }
+    });
+  }
+
+  // Upload backup (create or update)
+  function uploadBackup(backup, existingFileId) {
+    const json       = JSON.stringify(backup);
+    const compressed = backupManager.compress(json);
+    const blob       = new Blob([compressed], { type: 'text/plain' });
+
+    // parents is only valid on POST (create). PATCH (update) rejects it.
+    const metaObj  = existingFileId
+      ? { name: SYNC_CONFIG.GDRIVE_FILE }
+      : { name: SYNC_CONFIG.GDRIVE_FILE, parents: ['appDataFolder'] };
+    const metaBlob = new Blob([JSON.stringify(metaObj)], { type: 'application/json' });
+
+    const form = new FormData();
+    form.append('metadata', metaBlob);
+    form.append('media',    blob);
+
+    const url    = existingFileId
+      ? 'https://www.googleapis.com/upload/drive/v3/files/' + existingFileId + '?uploadType=multipart'
+      : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+    const method = existingFileId ? 'PATCH' : 'POST';
+
+    return fetch(url, {
+      method,
+      headers: { 'Authorization': 'Bearer ' + googleAuth.getToken() },
+      body: form,
+    }).then(function(r) {
+      if (!r.ok) return r.text().then(function(t) { throw new Error('Upload failed ' + r.status + ': ' + t); });
+      return r.json();
+    });
+  }
+
+  function signIn() {
+    googleAuth.signIn().then(function() {
+      showToast('Signed in — starting sync…');
+      syncNow();
+    }).catch(function(err) {
+      showToast('Sign-in failed: ' + (err.message || 'unknown error'));
+    });
+  }
+
+  function signOut() {
+    googleAuth.signOut();
+    _fileId = null;
+  }
+
+  function syncNow() {
+    if (_syncing) { showToast('Sync already in progress…'); return; }
+    // Auto-refresh token if expiring soon (within 5 minutes)
+    if (!googleAuth.isSignedIn()) {
+      showToast('Sign in to sync');
+      return;
+    }
+    if (!navigator.onLine) { showToast('Offline — sync when connected'); return; }
+
+    _syncing = true;
+    setStatus('syncing');
+    setProgress(10);
+
+    const local = backupManager.buildBackup();
+    setProgress(20);
+
+    findBackupFile().then(function(fileId) {
+      _fileId = fileId;
+      setProgress(40);
+
+      if (!fileId) {
+        // No remote — upload local
+        return uploadBackup(local, null).then(function(res) {
+          _fileId = res.id;
+          setProgress(90);
+          return { action: 'uploaded', source: 'local' };
+        });
+      }
+
+      // Download remote, merge, then upload the merged result
+      return downloadBackup(fileId).then(function(remote) {
+        setProgress(65);
+        const result = conflictResolver.resolve(local, remote);
+
+        // Always apply the merged winner locally first
+        backupManager.applyBackup(result.winner);
+        setProgress(75);
+
+        // Always upload the merged result back to Drive so both devices
+        // converge to the same state. Without this, the device that
+        // "lost" the conflict would re-upload its stale data on next sync.
+        return uploadBackup(result.winner, fileId).then(function() {
+          setProgress(88);
+          const quizCount = Object.keys(result.winner.studyProgress || {}).length;
+          return { action: 'merged', source: result.source, quizCount };
+        });
+      });
+
+    }).then(function(result) {
+      _syncing = false;
+      setProgress(100);
+      setStatus('synced');
+      const now = Date.now();
+      localStorage.setItem(SYNC_CONFIG.LS_LAST_SYNC, String(now));
+      updateLastSyncUI();
+      let msg;
+      if (result.action === 'merged') {
+        msg = 'Sync complete — ' + (result.quizCount || 0) + ' quiz(zes) merged';
+      } else if (result.action === 'uploaded') {
+        msg = 'Sync complete — uploaded to cloud';
+      } else {
+        msg = 'Sync complete';
+      }
+      showToast(msg);
+    }).catch(function(err) {
+      _syncing = false;
+      setProgress(0);
+      setStatus('error');
+      console.error('Sync error:', err);
+      showToast('Sync failed: ' + (err.message || 'check connection'));
+    });
+  }
+
+  // Debounced auto-sync triggered after local changes
+  function scheduleSync() {
+    if (!googleAuth.isSignedIn() || !navigator.onLine) return;
+    clearTimeout(_debTimer);
+    _debTimer = setTimeout(syncNow, SYNC_CONFIG.SYNC_DEBOUNCE_MS);
+  }
+
+  // Called on app start
+  function init() {
+    const wasSignedIn = googleAuth.signInSilent();
+    updateLastSyncUI();
+    if (wasSignedIn && navigator.onLine) {
+      // Wait 2s after load to avoid blocking startup
+      setTimeout(syncNow, 2000);
+    }
+    window.addEventListener('online', function() {
+      if (googleAuth.isSignedIn()) {
+        showToast('Back online — syncing…');
+        setTimeout(syncNow, 1000);
+      }
+    });
+  }
+
+  return { signIn, signOut, syncNow, scheduleSync, updateLastSyncUI, init };
+})();
+
+// ─────────────────────────────────────────────────────────────
+// ⑥ SETTINGS VIEW CONTROLLER
+// ─────────────────────────────────────────────────────────────
+const settingsView = (function() {
+
+  function updateAuthUI(signedIn, email, name) {
+    const userLabel   = document.getElementById('sync-user-label');
+    const userEmail   = document.getElementById('sync-user-email');
+    const signinBtn   = document.getElementById('sync-signin-btn');
+    const signoutBtn  = document.getElementById('sync-signout-btn');
+    const controls    = document.getElementById('sync-controls');
+    if (!userLabel) return;
+
+    if (signedIn) {
+      userLabel.textContent  = name || 'Signed in';
+      userEmail.textContent  = email || 'Google account';
+      signinBtn.classList.add('hidden');
+      signoutBtn.classList.remove('hidden');
+      controls.classList.remove('hidden');
+    } else {
+      userLabel.textContent  = 'Not signed in';
+      userEmail.textContent  = 'Sign in to enable cross-device sync';
+      signinBtn.classList.remove('hidden');
+      signoutBtn.classList.add('hidden');
+      controls.classList.add('hidden');
+    }
+  }
+
+  function updatePrevBackupInfo() {
+    const el  = document.getElementById('prev-backup-info');
+    const btn = document.getElementById('restore-prev-btn');
+    if (!el) return;
+    const raw = localStorage.getItem(SYNC_CONFIG.LS_PREV_BACKUP);
+    if (raw) {
+      try {
+        const b = JSON.parse(raw);
+        const d = b.lastModified ? new Date(b.lastModified).toLocaleString() : 'unknown time';
+        el.textContent = 'Saved before last import · ' + d;
+        if (btn) btn.disabled = false;
+      } catch(e) { el.textContent = 'No previous backup stored'; }
+    } else {
+      el.textContent = 'No previous backup stored';
+      if (btn) btn.disabled = true;
+    }
+  }
+
+  function refreshStats() {
+    // Storage estimate
+    if (navigator.storage && navigator.storage.estimate) {
+      navigator.storage.estimate().then(function(est) {
+        const used = est.usage ? (est.usage / 1024).toFixed(1) + ' KB used' : 'unknown';
+        const el = document.getElementById('db-usage');
+        if (el) el.textContent = used;
+      });
+    } else {
+      const el = document.getElementById('db-usage');
+      if (el) el.textContent = 'API not available';
+    }
+
+    // Quiz count
+    const quizCount = getAllSavedSlots().length;
+    const qel = document.getElementById('db-quiz-count');
+    if (qel) qel.textContent = quizCount + ' quiz' + (quizCount !== 1 ? 'zes' : '');
+
+    // Anki count
+    const ankiEl = document.getElementById('db-anki-count');
+    if (ankiEl) {
+      const n = Object.keys(getAnkiDeck()).length;
+      ankiEl.textContent = n + ' card' + (n !== 1 ? 's' : '');
+    }
+  }
+
+  function toggleThemeFromSwitch() {
+    toggleTheme();
+    // toggleTheme() already updates the switch via its own logic
+  }
+
+  function confirmClearAll() {
+    showConfirmModal(
+      'Clear All Local Data?',
+      'This will permanently delete all quizzes, progress, presets, and settings on this device. This cannot be undone.',
+      'Clear All',
+      function() {
+        localStorage.clear();
+        renderLibrary();
+        renderPresets();
+        updateAnkiCountDisplay();
+        showToast('All local data cleared');
+        refreshStats();
+      }
+    );
+  }
+
+  function onShow() {
+    refreshStats();
+    updatePrevBackupInfo();
+    syncManager.updateLastSyncUI();
+    // Sync theme toggle switch to current theme
+    const sw = document.getElementById('theme-toggle-switch');
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (sw) sw.classList.toggle('on', isDark);
+    // Show platform-specific sign-in hint
+    const subEl = document.getElementById('sync-user-email');
+    const btnEl = document.getElementById('sync-signin-btn');
+    if (subEl && !googleAuth.isSignedIn()) {
+      subEl.textContent = 'Sign in to enable cross-device sync';
+      if (btnEl) btnEl.textContent = 'Sign In with Google';
+    }
+  }
+
+  return { updateAuthUI, updatePrevBackupInfo, refreshStats, toggleThemeFromSwitch, confirmClearAll, onShow };
+})();
+
+// ─────────────────────────────────────────────────────────────
+// GENERIC CONFIRM MODAL (no window.confirm)
+// ─────────────────────────────────────────────────────────────
+function showConfirmModal(title, message, confirmLabel, onConfirm) {
+  const existing = document.getElementById('confirm-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'confirm-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9001;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:20px';
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--radius2);padding:24px;width:100%;max-width:340px;box-shadow:var(--shadow)';
+
+  const titleEl = document.createElement('div');
+  titleEl.style.cssText = 'font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px';
+  titleEl.textContent = title;
+
+  const msgEl = document.createElement('div');
+  msgEl.style.cssText = 'font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;font-family:var(--body)';
+  msgEl.textContent = message;
+
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText = 'flex:1;padding:10px;background:transparent;border:1.5px solid var(--border2);border-radius:var(--radius);color:var(--text2);font-family:var(--mono);font-size:11px;cursor:pointer;text-transform:uppercase';
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.textContent = confirmLabel || 'Confirm';
+  confirmBtn.style.cssText = 'flex:1;padding:10px;background:var(--red);border:none;border-radius:var(--radius);color:#fff;font-family:var(--mono);font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:600';
+
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(confirmBtn);
+  box.appendChild(titleEl);
+  box.appendChild(msgEl);
+  box.appendChild(btnRow);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+
+  cancelBtn.addEventListener('click', function() { modal.remove(); });
+  confirmBtn.addEventListener('click', function() { modal.remove(); onConfirm(); });
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPOSE MODULES TO GLOBAL SCOPE
+// onclick="..." handlers in HTML run in window scope.
+// const/let are block-scoped and invisible there, so we
+// explicitly attach every module that HTML buttons call.
+// ─────────────────────────────────────────────────────────────
+window.dbManager       = dbManager;
+window.backupManager   = backupManager;
+window.googleAuth      = googleAuth;
+window.conflictResolver= conflictResolver;
+window.syncManager     = syncManager;
+window.settingsView    = settingsView;
+window.showConfirmModal= showConfirmModal;
+
+// Add sync badge element to settings nav button
+(function addSyncBadge() {
+  const navBtn = document.getElementById('nav-settings');
+  if (navBtn) {
+    const badge = document.createElement('div');
+    badge.id = 'nav-sync-badge';
+    badge.className = 'nav-sync-badge';
+    navBtn.style.position = 'relative';
+    navBtn.appendChild(badge);
+  }
+})();
+
+// ─────────────────────────────────────────────────────────────
+
+// START SYNC  (called here, after all modules are defined)
+// ─────────────────────────────────────────────────────────────
+syncManager.init();
+
+
+</script>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <div class="toast-dot"></div>
+  <span id="toast-msg">Saved</span>
+</div>
+
+</body>
+</html>
