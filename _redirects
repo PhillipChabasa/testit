@@ -1,0 +1,4 @@
+# Netlify redirects
+# Route everything through index.html EXCEPT auth.html
+/auth.html  /auth.html  200
+/*          /index.html 200
