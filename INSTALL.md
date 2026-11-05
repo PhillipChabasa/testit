@@ -1,4 +1,6 @@
-# TESTIT — Playful Geometric Edition
+# TESTIT — Practice & Remember
+
+Phase 1 adds a professional Create Test and question-taking workspace. See [QBANK.md](QBANK.md) for local preview instructions, optional JSON metadata, timing rules, compatibility safeguards, and tests. Deployments must include `qbank-core.js`, `qbank.js`, and `qbank.css` alongside the existing app files.
 
 This update adds concept-based revision to the existing TESTIT app. The AI workflow remains external: create a prompt, paste it into your AI, then import its JSON response. No API key or AI subscription is configured inside this app.
 

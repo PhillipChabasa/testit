@@ -1,135 +1,61 @@
-// ═══════════════════════════════════════════════════
-//  TESTIT SERVICE WORKER  v4.0  (PWA)
-//  Strategy:
-//    • App shell  → Cache-first (instant loads)
-//    • Google APIs → Network-only (never cache tokens)
-//    • Google Fonts → Stale-while-revalidate
-//    • Everything else → Network-first with cache fallback
-// ═══════════════════════════════════════════════════
-
-const CACHE_NAME   = 'testit-v8-playful-concepts';
-// Paths are relative to the SW scope (the directory sw.js lives in).
-// This works correctly whether deployed at root or in a subdirectory.
-const SHELL_URLS   = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-];
-
-// ── Install: pre-cache the app shell ────────────────
-self.addEventListener('install', event => {
+/* TESTIT 2: keeps study data untouched and waits for an explicit safe update. */
+const CACHE_NAME = "testit2-shell-e18bb040a2fe8ee0";
+const SHELL_URLS = ["./","./index.html","./manifest.json","./icons/icon-192.png","./icons/icon-512.png","./assets/History-D4Rfxz6k.js","./assets/Library-DwDVINlM.js","./assets/PromptBuilder-ko_Q5myH.js","./assets/Revision-tE_zNAjN.js","./assets/Settings-CPHq792c.js","./assets/TestBuilder-Cw8cO0ci.js","./assets/Workspace-CX_3q_bA.js","./assets/dm-sans-latin-400-normal-BwCSEQnW.woff","./assets/dm-sans-latin-400-normal-CW0RaeGs.woff2","./assets/dm-sans-latin-500-normal-B9HHJjqV.woff2","./assets/dm-sans-latin-500-normal-Dr3UlScf.woff","./assets/dm-sans-latin-600-normal-Aqo67rzb.woff2","./assets/dm-sans-latin-600-normal-BmdmIIQ2.woff","./assets/dm-sans-latin-700-normal-CUSSCpQX.woff","./assets/dm-sans-latin-700-normal-DvUfVpUG.woff2","./assets/download-ClnHVuKz.js","./assets/index-BSait_4u.css","./assets/index-DMiF-LOH.js","./assets/outfit-latin-400-normal-BGsTXAXT.woff2","./assets/outfit-latin-400-normal-DMwTpYkH.woff","./assets/outfit-latin-500-normal-ClnHRwRh.woff","./assets/outfit-latin-500-normal-DKnIMDSk.woff2","./assets/outfit-latin-600-normal-B7SfZ07L.woff2","./assets/outfit-latin-600-normal-BEfTtDA7.woff","./assets/outfit-latin-700-normal-Cu9v6i1X.woff2","./assets/outfit-latin-700-normal-D4itBLBr.woff","./assets/rotate-ccw-DBuiwhxf.js"];
+const shellPaths = new Set(
+  SHELL_URLS.map((path) => new URL(path, self.registration.scope).pathname),
+);
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_URLS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_URLS)),
   );
 });
-
-// ── Activate: remove stale caches ───────────────────
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k.startsWith('testit-') && k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+self.addEventListener("activate", (event) => {
+  // Retain existing caches during cutover; other open clients may still need them.
+  event.waitUntil(self.clients.claim());
 });
-
-// ── Fetch routing ────────────────────────────────────
-self.addEventListener('fetch', event => {
-  const { request } = event;
-  const url = new URL(request.url);
-  if (request.method !== 'GET') return;
-
-  // Never intercept Google auth / API calls — always network
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+});
+self.addEventListener("fetch", (event) => {
+  const request = event.request,
+    url = new URL(request.url),
+    scope = new URL(self.registration.scope);
   if (
-    url.hostname.includes('googleapis.com') ||
-    url.hostname.includes('accounts.google.com') ||
-    url.hostname.includes('oauth2.googleapis.com')
+    request.method !== "GET" ||
+    url.origin !== scope.origin ||
+    url.pathname.startsWith(scope.pathname + "legacy/")
+  )
+    return;
+  if (
+    request.mode === "navigate" &&
+    (url.pathname === scope.pathname ||
+      url.pathname === scope.pathname + "index.html")
   ) {
-    event.respondWith(fetch(request));
-    return;
-  }
-
-  // Google Fonts: stale-while-revalidate
-  if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
-    event.respondWith(staleWhileRevalidate(request));
-    return;
-  }
-
-  // App shell URLs: cache-first
-  if (url.origin === self.location.origin && request.mode !== 'navigate' && SHELL_URLS.some(path => new URL(path, self.registration.scope).pathname === url.pathname)) {
-    event.respondWith(cacheFirst(request));
-    return;
-  }
-
-  // Everything else: network-first with cache fallback
-  event.respondWith(networkFirst(request));
-});
-
-// ── Background sync for Drive ─────────────────────
-self.addEventListener('sync', event => {
-  if (event.tag === 'testit-drive-sync') {
-    // Signal all clients to run sync
-    event.waitUntil(
-      self.clients.matchAll({ includeUncontrolled: true, type: 'window' })
-        .then(clients => {
-          clients.forEach(c => c.postMessage({ type: 'BACKGROUND_SYNC' }));
+    event.respondWith(
+      fetch(request)
+        .then(async (response) => {
+          // Never overwrite an older version's offline shell with a newer HTML build.
+          return response.ok
+            ? response
+            : (await caches.open(CACHE_NAME))
+                .match(new URL("./index.html", scope).href)
+                .then((cached) => cached || response);
         })
+        .catch(
+          async () =>
+            (await (
+              await caches.open(CACHE_NAME)
+            ).match(new URL("./index.html", scope).href)) ||
+            new Response("Offline", { status: 503 }),
+        ),
     );
+    return;
   }
+  if (shellPaths.has(url.pathname))
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        return (await cache.match(request)) || fetch(request);
+      })(),
+    );
 });
-
-// ── Message handler (ping from app) ──────────────
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  // Cache a specific URL on demand
-  if (event.data && event.data.type === 'CACHE_URL') {
-    caches.open(CACHE_NAME).then(cache => cache.add(event.data.url));
-  }
-});
-
-// ── Strategy helpers ─────────────────────────────
-
-async function cacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    return new Response('Offline', { status: 503 });
-  }
-}
-
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    const cached = await caches.match(request);
-    const shell = request.mode === 'navigate' ? await caches.match(new URL('./index.html', self.registration.scope).href) : null;
-    return cached || shell || new Response('Offline', { status: 503 });
-  }
-}
-
-async function staleWhileRevalidate(request) {
-  const cached = await caches.match(request);
-  const fetchPromise = fetch(request).then(response => {
-    if (response.ok) {
-      caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
-    }
-    return response;
-  }).catch(() => null);
-  return cached || await fetchPromise || new Response('Offline', { status: 503 });
-}

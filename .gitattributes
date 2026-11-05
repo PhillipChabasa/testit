@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.woff binary
+*.woff2 binary
+# Generated bundles and preserved legacy markup may contain intentional string whitespace.
+assets/** -whitespace
+legacy/** -whitespace

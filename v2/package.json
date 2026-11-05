@@ -1,0 +1,39 @@
+{
+  "name": "testit-2",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/prepare-legacy.mjs && vite --host 127.0.0.1",
+    "build": "node scripts/prepare-legacy.mjs && tsc -b && vite build && node scripts/build-release.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "test:browser": "node tests/workflows.mjs",
+    "test:release": "node tests/release-cutover.mjs",
+    "release:stage": "node scripts/stage-release.mjs",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write src tests scripts vite.config.ts tsconfig.json package.json index.html"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/outfit": "^5.3.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "lucide-react": "^0.468.0",
+    "motion": "^12.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.4.0",
+    "playwright-core": "^1.51.0",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.0.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.0",
+    "vitest": "^3.1.0"
+  }
+}
